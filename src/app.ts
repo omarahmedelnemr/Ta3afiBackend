@@ -1,23 +1,16 @@
 import { getCorsAccess } from './Middleware/cors'
 import { Authenticate } from './Middleware/Auth'
-// import InitializeChat from './Server/ChatRouter'
-const { InitializeChat } = require('./Server/ChatRouter'); // Adjust the path as needed
 
-// import upload from './DB_Connections/fileUpload'
 
-// const multer = require('multer')
 const path = require('path')
 var cors = require('cors')
 const express = require('express');
-const fileUpload = require('express-fileupload');
 const app = express()
+
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 var jwt = require('jsonwebtoken');
 
-// For SocketIO Chat
-var http = require('http');
-const server = http.createServer(app);
-InitializeChat(server)
 
 app.set('Access-Control-Allow-Origin', 'http://localhost:3000');
 
@@ -30,15 +23,12 @@ app.use(fileUpload());
 
 app.use(express.json());
 app.use(cookieParser());
-// app.use('/',chatInit)
 app.set("view engine",'ejs')
 
 
-// app.use(express.static(__dirname+'/views'))
-// app.get('/',async (req,res)=>{
-//     res.sendFile('views/index.html', {root: __dirname })
-//     res.status(200).json("Wlcome to my API")
-// })
+app.get('/',async (req,res)=>{
+    res.status(200).json("Welcome to API, It's Working")
+})
 
 
 
@@ -69,4 +59,4 @@ app.get("/checkauth",Authenticate,async (req:any,res:any)=>{
 
     
 })
-export default server
+export default app
