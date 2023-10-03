@@ -1,6 +1,6 @@
 import { getCorsAccess } from './Middleware/cors'
 import { Authenticate } from './Middleware/Auth'
-
+import GeneralRouter from "./Server/General" 
 //Main Modules
 var cors = require('cors')
 const express = require('express');
@@ -26,6 +26,10 @@ app.use(fileUpload());
 app.use(express.json());
 app.use(cookieParser());
 app.set("view engine",'ejs')
+
+// Middle API Servers
+app.use("/",GeneralRouter)
+
 
 // Base endpoint to Test That API is Working
 app.get('/',async (req,res)=>{
