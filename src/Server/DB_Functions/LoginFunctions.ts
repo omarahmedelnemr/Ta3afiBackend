@@ -71,30 +71,37 @@ class LoginFunctions{
 
     }
 
-
+    // General Signup using Just Email and Password
     async Signup(reqData){
+
+        // Check Parameter Existance
         if (checkUndefined(reqData,["email","password","role"])){
             return commonResposes.missingParam
         }
         try{
+            // Check if the Email Already in User
             const checkExist = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
             if (checkExist !== null){
                 return commonResposes.alreadyExist
-            }
-
-
+            }   
+            
+            // Create New Login Route with Role Check
             const newLoginRouter    = new LoginRouter()
             newLoginRouter.email    = reqData['email']
             newLoginRouter.password = await  bcrypt.hash(reqData['password'],10)
             if (reqData['role'].toLowerCase() === 'doctor' || reqData['role'].toLowerCase() === 'patient'){
                 newLoginRouter.role     = reqData["role"].toLowerCase()
             }else{
+
+                // The role is Entered Wrong
                 return commonResposes.Error
             }
+            // Base UserID Number
             newLoginRouter.userID   = -1
             await Database.getRepository(LoginRouter).save(newLoginRouter)
 
 
+            // Create A Confirmation Code and Store it in DB
             const fourDigitsVerficationConde = `${Math.round(Math.random()*9)}${Math.round(Math.random()*9)}${Math.round(Math.random()*9)}${Math.round(Math.random()*9)}`
             const newVerCode = new ConfirmCode()
             newVerCode.email = reqData['email']
@@ -102,7 +109,8 @@ class LoginFunctions{
             newVerCode.expiresIn =  new Date(new Date().getTime() + 2 * 60 * 1000);
             await Database.getRepository(ConfirmCode).save(newVerCode)
 
-            SendMail("omarahmedelnemr16@gmail.com","Confirm Your Email",`Welcome To Ta3afi, here your Code to Verify Your Email ${fourDigitsVerficationConde}`)
+            // Send Email with the Confirmation Code
+            SendMail(reqData['email'],"Confirm Your Email",`Welcome To Ta3afi, here your Code to Verify Your Email ${fourDigitsVerficationConde}`)
             return commonResposes.sendData("Verfication Code Sent")
         }catch(err){
             console.log("Error!\n",err)
@@ -110,50 +118,76 @@ class LoginFunctions{
         }
     }
 
+    // Re Send the Confirmation Code as a Seprated Function
     async reSendConfirmCode(reqData){
+
+        // Check Parameter Existance
         if (checkUndefined(reqData,["email"])){
             return commonResposes.missingParam
         }
         try{
+            
+            // Check if the Email is Having a Pre Sent Code
             const preCode = await Database.getRepository(ConfirmCode).findOneBy({email:reqData['email']})
             const fourDigitsVerficationConde = `${Math.round(Math.random()*9)}${Math.round(Math.random()*9)}${Math.round(Math.random()*9)}${Math.round(Math.random()*9)}`
+            
+            // Update the Existing Email Code
             if (preCode !== null){
                 preCode.code = fourDigitsVerficationConde
                 preCode.expiresIn =  new Date(new Date().getTime() + 2 * 60 * 1000);
                 await Database.getRepository(ConfirmCode).save(preCode)
-            }else{
+            }
+            
+            //Create the Code as New
+            else{
                 const newVerCode = new ConfirmCode()
                 newVerCode.email = reqData['email']
                 newVerCode.code  = fourDigitsVerficationConde
                 newVerCode.expiresIn =  new Date(new Date().getTime() + 2 * 60 * 1000);
                 await Database.getRepository(ConfirmCode).save(newVerCode)
             }
-            SendMail("omarahmedelnemr16@gmail.com","Confirm Your Email",`Welcome To Ta3afi,\nhere is your Code to Confirm Your Email: ${fourDigitsVerficationConde}`)
+
+            // Send Email With the Code
+            SendMail(reqData['email'],"Confirm Your Email",`Welcome To Ta3afi,\nhere is your Code to Confirm Your Email: ${fourDigitsVerficationConde}`)
             return commonResposes.sendData("Confirmation Code Sent")
         }catch(err){
             console.log("Error!\n",err)
             return commonResposes.Error
         }
     }
+
+    // Check if the Code is Correct and on Date
     async verifyCode(reqData){
+
+        // Check Parameter Existance
         if (checkUndefined(reqData,["email","code"])){
             return commonResposes.missingParam
         }
         try{
+            // Get the Code Info and Check if it Even Exist
             const code = await Database.getRepository(ConfirmCode).findOneBy({email:reqData['email']})
             if (code === null){
                 return commonResposes.notFound
             }
+            // Check Code Expiration Date
             const currentDate = new Date()
             if (currentDate > code.expiresIn){
                 return commonResposes.sendError("Code Expired")
-            }else if (code.code !== reqData['code']){
+            }
+
+            // Check if the Entered Code is Not Correct
+            else if (code.code !== reqData['code']){
                 return commonResposes.sendError("Wrong Code")
-            }else{
+            }
+            
+            // The Code is Correct
+            else{
+                // Update the Confirmed Status on Login Router
                 const loginRoute = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
                 loginRoute.confirmed = true
                 await Database.getRepository(LoginRouter).save(loginRoute)
 
+                // Remove Confirmation Code from DB
                 await Database
                 .getRepository(ConfirmCode)
                 .createQueryBuilder('ConfirmCode')
@@ -162,6 +196,7 @@ class LoginFunctions{
                 .where("email = :email", { email: reqData['email'] })
                 .execute()
                 
+                // Return to the FrontEnd
                 return commonResposes.sendData("Code Verified")
             }
         }catch(err){

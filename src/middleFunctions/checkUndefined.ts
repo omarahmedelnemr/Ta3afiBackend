@@ -1,11 +1,16 @@
+// Check if Parameter are Defined in the Req Body or Req Query
 function checkUndefined(reqData,params){
-    console.log(`${params[0]} in ${reqData[params[0]]}`)
-    console.log("hello")
+
+    // Iterate on all Parameters and Check if Undefined
     for(var param of params){
         if (reqData[param] === undefined){
+
+            // Some Parameter are Undefined
             return true
         }
     }
+
+    // All Parameters are There
     return false
 }
 
