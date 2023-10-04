@@ -1,5 +1,7 @@
-class CommonResponse{
-    //Common Responses
+// Generate Responses With No Need To Hard Code Them
+class GenerateResponse{
+    
+    // Common Responses Variable
     missingParam   = {status:406,data:"Missing Parameter"};
     notFound       = {status:404,data:"Not Found"}
     done           = {status:200,data:"Done"}
@@ -7,6 +9,7 @@ class CommonResponse{
     wrongPassword  = {status:404,data:"Wrong Password"}
     alreadyExist   = {status:406,data:"Email Already Exist"}
 
+    // Common Responses Functions
     sendData(data){
         return {status:200,data:data}
     }
@@ -15,4 +18,4 @@ class CommonResponse{
     }
 }
 
-export default new CommonResponse();
+export default new GenerateResponse();
