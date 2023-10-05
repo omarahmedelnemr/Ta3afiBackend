@@ -12,6 +12,12 @@ export class Doctor{
     @Column()
     title: string
 
+    @Column()
+    birthDate: Date
+
+    @Column()
+    gender: string
+
     @Column({nullable:true})
     location: string
 

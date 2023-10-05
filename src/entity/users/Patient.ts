@@ -10,5 +10,8 @@ export class Patient{
     name: string
 
     @Column()
-    age: number
+    birthDate: Date
+
+    @Column()
+    gender: string
 }
