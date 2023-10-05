@@ -485,51 +485,6 @@ class LoginFunctions{
             return commonResposes.Error
         }
     }
-
-
-
-
-
-    async DeleteAccount(reqData){
-        // Check Parameter Existance
-        if (checkUndefined(reqData,["email","password"])){
-            return commonResposes.missingParam
-        }
-        try{
-            // Get The User's Login Info and check if Exist
-            const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
-            if (loginInfo === null){
-                return commonResposes.notFound
-            }
-
-            //check if Password is Right
-            if (! await bcrypt.compare(reqData['password'],loginInfo['password'])){
-                return commonResposes.wrongPassword
-            }
-
-            // Check if user Data is Complete
-            if (loginInfo['completeInfo']){
-
-                // Remove User's Name and Info 
-
-            }
-
-            // Remove the Login Route for This User
-            await Database
-            .getRepository(LoginRouter)
-            .createQueryBuilder('LoginRouter')
-            .delete()
-            .from(LoginRouter)
-            .where("email = :email", { email: reqData['email'] })
-            .execute()
-
-
-
-        }catch(err){
-            console.log("Error!\n",err)
-            return commonResposes.Error
-        }
-    }
 }
 
 export default new LoginFunctions();

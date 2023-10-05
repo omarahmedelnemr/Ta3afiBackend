@@ -88,18 +88,4 @@ router.post("/reset-password",async (req,res)=>{
 })
 
 
-
-
-
-router.delete("/account",async (req,res)=>{
-    const response = await LoginFunctions.DeleteAccount(req.body)
-    res.status(response['status']).json(response['data'])
-})
-
-
-
-
-
-
-
 export default router
