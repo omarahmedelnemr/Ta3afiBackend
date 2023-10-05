@@ -23,7 +23,7 @@ router.post("/signup",async (req,res)=>{
 
 // Resend the Confirmation Code 
 router.post("/resend-confirm-Code",async (req,res)=>{
-    const response = await LoginFunctions.reSendConfirmCode(req.body)
+    const response = await LoginFunctions.SendConfirmCode(req.body)
     res.status(response['status']).json(response['data'])
 })
 
@@ -69,21 +69,28 @@ router.post("/change-password",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-
-
-
-
-
-router.post("/send-forget-password-email",async (req,res)=>{
-    const response = await LoginFunctions.sendForgetPasswordEmail(req.body)
+// Send a Confirmation Code To User's Email
+router.post("/forget-password",async (req,res)=>{
+    const response = await LoginFunctions.SendConfirmCode(req.body)
     res.status(response['status']).json(response['data'])
 })
-router.post("/forgetPassword",async (req,res)=>{
-    
+
+//Check if the sent Code is Correct
+router.post("/confirm-forget-password",async (req,res)=>{
+    const response = await LoginFunctions.ConfirmForgetPasswordCode(req.body)
+    res.status(response['status']).json(response['data'])
 })
-router.post("/changeEmail",async (req,res)=>{
-    
+
+// Reset The Password with Authorization Check
+router.post("/reset-password",async (req,res)=>{
+    const response = await LoginFunctions.ResetPassword(req.body)
+    res.status(response['status']).json(response['data'])
 })
+
+
+
+
+
 router.delete("/account",async (req,res)=>{
     const response = await LoginFunctions.DeleteAccount(req.body)
     res.status(response['status']).json(response['data'])

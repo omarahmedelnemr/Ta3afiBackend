@@ -16,10 +16,6 @@ var jwt = require('jsonwebtoken');
 
 class LoginFunctions{
 
-
-
-    /////// Functions
-
     //Login Route
     async Login(loginData){
 
@@ -120,7 +116,7 @@ class LoginFunctions{
     }
 
     // Re Send the Confirmation Code as a Seprated Function
-    async reSendConfirmCode(reqData){
+    async SendConfirmCode(reqData){
 
         // Check Parameter Existance
         if (checkUndefined(reqData,["email"])){
@@ -406,22 +402,90 @@ class LoginFunctions{
         }
     }
 
-
-
-
-
-    async sendForgetPasswordEmail(reqData){
+    // Check If the Sent Code is Good For Reset Password Opertation
+    async ConfirmForgetPasswordCode(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email"])){
+        if (checkUndefined(reqData,["email",'code'])){
             return commonResposes.missingParam
         }
         try{
+            // Get the Code Info and Check if it Even Exist
+            const code = await Database.getRepository(ConfirmCode).findOneBy({email:reqData['email']})
+            if (code === null){
+                return commonResposes.notFound
+            }
+
+            // Check Code Expiration Date
+            const currentDate = new Date()
+            if (currentDate > code.expiresIn){
+                return commonResposes.sendError("Code Expired")
+            }
+
+            // Check if the Entered Code is Not Correct
+            else if (code.code !== reqData['code']){
+                return commonResposes.sendError("Wrong Code")
+            }
             
+            // The Code is Correct
+            else{
+                // Generate a Secret JWT Code for Reset Password Operation that Last For Two Hours
+                const JWTData = {
+                    "email":reqData['email']
+                }
+                const token = jwt.sign( JWTData,process.env.JWTsecret,{ expiresIn: 60 * 60 *2 } ) 
+
+                // Remove Confirmation Code from DB
+                await Database
+                .getRepository(ConfirmCode)
+                .createQueryBuilder('ConfirmCode')
+                .delete()
+                .from(ConfirmCode)
+                .where("email = :email", { email: reqData['email'] })
+                .execute()
+                
+                // Return to the FrontEnd
+                return commonResposes.sendData({message:"Code Verified",secretCode:token})
+            }
         }catch(err){
             console.log("Error!\n",err)
             return commonResposes.Error
         }
     }
+
+    // Reset The Password After Authorization Check
+    async ResetPassword(reqData){
+        // Check Parameter Existance
+        if (checkUndefined(reqData,["email",'secretCode',"newPassword"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check if the Secret Code is Authorized
+            try{
+                const jwtData = await jwt.verify(reqData['secretCode'],process.env.JWTsecret)
+                if (jwtData['email'] !== reqData['email']){
+                    throw new Error("Invalid JWT")
+                }
+            }catch(err){
+                return commonResposes.sendError("Not Authorized")
+            }
+
+            // The Token is Ok, so Get The Login Info
+            const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
+            if (loginInfo === null){
+                return commonResposes.notFound
+            }
+
+            // Change the Password
+            loginInfo.password = await bcrypt.hash(reqData['newPassword'],10)
+            await Database.getRepository(LoginRouter).save(loginInfo)
+
+            return commonResposes.sendData("Password Reseted Successfully")
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
 
 
 
