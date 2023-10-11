@@ -11,10 +11,42 @@ const bcrypt = require("bcrypt")
 
 class profileEditFunctions{
 
+    // Change Users Password
+    async changePassword(reqData){
+        // Check Parameter Existance
+        if (checkUndefined(reqData,["email","oldPassword","newPassword"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Get User's Login Information
+            const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
+            if (loginInfo === null){
+                return commonResposes.notFound
+            }
+
+            // Check if old Password is Correct
+            if (! await bcrypt.compare(reqData['oldPassword'],loginInfo.password)){
+                return commonResposes.wrongPassword
+            }
+
+            // Change the Password
+            loginInfo.password = await bcrypt.hash(reqData['newPassword'],10)
+            await Database.getRepository(LoginRouter).save(loginInfo)
+
+            // Send Notification Mail
+            SendMail(reqData['email'],"Password Changed","Hello,\nWe Would Like to Tell You That You Changed Your Password Successfully,\nif You are not the One who Change It, please Contact us Immediately")
+            return commonResposes.sendData("Password Changed Successfully")
+            
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
     // Complete the Signup for Doctors (Education)
     async AddDoctorEducation(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","educaion"])){
+        if (checkUndefined(reqData,["email","title","place","startDate"])){
             return commonResposes.missingParam
         }
         try{
@@ -29,15 +61,14 @@ class profileEditFunctions{
             const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:LoginInfo.userID})
                         
             // Adding Doctors Educations
-            for(var edu of reqData['educaion']){
-                var newEducation     = new DoctorEducaion()
-                newEducation.doctor    = currentDoctor
-                newEducation.title     = edu['title']
-                newEducation.place     = edu['place']
-                newEducation.startDate = new Date(edu['startDate'])
-                newEducation.endDate   = new Date(edu['endDate'])
-                await Database.getRepository(DoctorEducaion).save(newEducation)
-            }
+            var newEducation     = new DoctorEducaion()
+            newEducation.doctor    = currentDoctor
+            newEducation.title     = reqData['title']
+            newEducation.place     = reqData['place']
+            newEducation.startDate = new Date(reqData['startDate'])
+            newEducation.endDate   = new Date(reqData['endDate'])
+            await Database.getRepository(DoctorEducaion).save(newEducation)
+            
             return commonResposes.done
 
         }catch(err){
@@ -49,7 +80,7 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Experince)
     async AddDoctorExperince(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","experince"])){
+        if (checkUndefined(reqData,["email","title","place","startDate"])){
             return commonResposes.missingParam
         }
         try{
@@ -64,15 +95,14 @@ class profileEditFunctions{
             const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:LoginInfo.userID})
 
             // Adding Doctors Experince
-            for(var exp of reqData['experince']){
-                var newExperince    = new DoctorExperince()
-                newExperince.doctor    = currentDoctor
-                newExperince.title     = exp['title']
-                newExperince.place     = exp['place']
-                newExperince.startDate = new Date(exp['startDate'])
-                newExperince.endDate   = new Date(exp['endDate'])
-                await Database.getRepository(DoctorExperince).save(newExperince)
-            }
+            var newExperince    = new DoctorExperince()
+            newExperince.doctor    = currentDoctor
+            newExperince.title     = reqData['title']
+            newExperince.place     = reqData['place']
+            newExperince.startDate = new Date(reqData['startDate'])
+            newExperince.endDate   = new Date(reqData['endDate'])
+            await Database.getRepository(DoctorExperince).save(newExperince)
+            
             return commonResposes.done
 
         }catch(err){
@@ -84,7 +114,7 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Certificate)
     async AddDoctorCertificate(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","certificate"])){
+        if (checkUndefined(reqData,["email","title","place","date"])){
             return commonResposes.missingParam
         }
         try{
@@ -99,15 +129,13 @@ class profileEditFunctions{
             const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:LoginInfo.userID})
 
             // Adding Doctor Certificate
-            for(var Cert of reqData['certificate']){
-                var newCertificate     = new DoctorCertificate()
-                newCertificate.doctor    = currentDoctor
-                newCertificate.title     = Cert['title']
-                newCertificate.place     = Cert['place']
-                newCertificate.startDate = new Date(Cert['startDate'])
-                newCertificate.endDate   = new Date(Cert['endDate'])
-                await Database.getRepository(DoctorCertificate).save(newCertificate)
-            }
+            var newCertificate     = new DoctorCertificate()
+            newCertificate.doctor    = currentDoctor
+            newCertificate.title     = reqData['title']
+            newCertificate.place     = reqData['place']
+            newCertificate.date = new Date(reqData['date'])
+            await Database.getRepository(DoctorCertificate).save(newCertificate)
+            
             return commonResposes.done
 
         }catch(err){
@@ -116,37 +144,6 @@ class profileEditFunctions{
         }
     }
 
-        // Change Users Password
-        async changePassword(reqData){
-            // Check Parameter Existance
-            if (checkUndefined(reqData,["email","oldPassword","newPassword"])){
-                return commonResposes.missingParam
-            }
-            try{
-                // Get User's Login Information
-                const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
-                if (loginInfo === null){
-                    return commonResposes.notFound
-                }
-    
-                // Check if old Password is Correct
-                if (! await bcrypt.compare(reqData['oldPassword'],loginInfo.password)){
-                    return commonResposes.wrongPassword
-                }
-    
-                // Change the Password
-                loginInfo.password = await bcrypt.hash(reqData['newPassword'],10)
-                await Database.getRepository(LoginRouter).save(loginInfo)
-    
-                // Send Notification Mail
-                SendMail(reqData['email'],"Password Changed","Hello,\nWe Would Like to Tell You That You Changed Your Password Successfully,\nif You are not the One who Change It, please Contact us Immediately")
-                return commonResposes.sendData("Password Changed Successfully")
-                
-            }catch(err){
-                console.log("Error!\n",err)
-                return commonResposes.Error
-            }
-        }
 }
 
 export default new profileEditFunctions();
