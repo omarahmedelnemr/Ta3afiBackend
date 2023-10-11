@@ -15,10 +15,7 @@ export class DoctorCertificate{
     place:string
 
     @Column()
-    startDate:Date
-
-    @Column()
-    endDate:Date
+    date:Date
 
     @ManyToOne(()=>Doctor,doctorID=>doctorID.id)
     @JoinColumn()
