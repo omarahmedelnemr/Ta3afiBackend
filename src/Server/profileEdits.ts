@@ -93,6 +93,29 @@ router.delete("/doctor-certificate-record",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Adding New Tag To a Doctor
+router.post("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.AddDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Removing tag for a Doctor
+router.delete("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.DeleteDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Adding New Tag To a Doctor
+router.post("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.AddDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Removing tag for a Doctor
+router.delete("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.DeleteDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
 
 //---------------------------------------------------------------------------------------------
 //------------------------------------ Patient Endpoints --------------------------------------
@@ -107,6 +130,18 @@ router.post("/patient-name",async (req,res)=>{
 // Change Patient's Name
 router.post("/patient-birthdate",async (req,res)=>{
     const response = await profileEditFunctions.changePatientBirthDate(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Add New Patient Hobby
+router.post("/patient-hobby",async (req,res)=>{
+    const response = await profileEditFunctions.AddPatientHobby(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Remove Patient Hobby
+router.delete("/patient-hobby",async (req,res)=>{
+    const response = await profileEditFunctions.DeletePatientHobby(req.body)
     res.status(response['status']).json(response['data'])
 })
 

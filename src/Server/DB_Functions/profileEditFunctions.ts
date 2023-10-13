@@ -9,6 +9,8 @@ import { DoctorCertificate } from "../../entity/DoctorInfo/DoctorCertificate";
 import SendMail from "../../middleFunctions/sendMail";
 import { ConfirmCode } from "../../entity/login/confirmationCode";
 import { Patient } from "../../entity/users/Patient";
+import { DoctorTag } from "../../entity/DoctorInfo/Tags";
+import { Hobby } from "../../entity/PatientInfo/hobby";
 const bcrypt = require("bcrypt")
 
 class profileEditFunctions{
@@ -393,7 +395,78 @@ class profileEditFunctions{
         }
     }
 
-    
+    // Add New Doctor Tag
+    async AddDoctorTag(reqData){
+        
+        // Check if Parameters Exist
+        if(checkUndefined(reqData,['doctorID',"tag"])){
+            return commonResposes.missingParam
+        }
+        try{
+            
+            // Perform Some Aditional Checks
+            if (reqData['tag'] === ''){
+                return commonResposes.sendError("Tag Cannot Be Empty")
+            }
+            
+            // if the Doctor Exceed The Tag Number Limit
+            const count =  await Database.getRepository(DoctorTag).countBy({doctor:{id:reqData['doctorID']}})
+            if (count >= 5 ){
+                return commonResposes.sendError('Doctor Exceeds The Maximum Number of Tags (5)')
+            }
+
+            // Check if Tag is Not Already Exist
+            const checkTag = await Database.getRepository(DoctorTag).findOneBy({doctor:{id:reqData['doctorID']},tag:reqData['tag']})
+            if (checkTag !== null){
+                return commonResposes.sendError("This Tag Already Exist")
+            }
+
+            // Create New Tag
+            const newTag  = new DoctorTag()
+            newTag.tag    = reqData['tag']
+            newTag.doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+
+            // Save it to The DB
+            await Database.getRepository(DoctorTag).save(newTag)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Removing Doctor Tag
+    async DeleteDoctorTag(reqData){
+
+        // Check if Parameters Exist
+        if(checkUndefined(reqData,['tagID',"doctorID"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check if Tag Even Exist
+            const checkTag = await Database.getRepository(DoctorTag).findOneBy({doctor:{id:reqData['doctorID']},id:reqData['tagID']})
+            if (checkTag === null){
+                return commonResposes.notFound
+            }
+
+            // Remove The Tag From DB
+            await Database
+            .getRepository(DoctorTag)
+            .createQueryBuilder('Tag')
+            .delete()
+            .from(DoctorTag)
+            .where("id = :tagID", { tagID: reqData['tagID'] })
+            .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
+            .execute()
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
     //---------------------------------------------------------------------------------------------
     //------------------------------------- Patient Endpoints -------------------------------------
     //---------------------------------------------------------------------------------------------
@@ -437,6 +510,79 @@ class profileEditFunctions{
 
         return commonResposes.done
     }
+
+    // Add New Doctor Tag
+    async AddPatientHobby(reqData){
+    
+        // Check if Parameters Exist
+        if(checkUndefined(reqData,['patientID',"hobby"])){
+            return commonResposes.missingParam
+        }
+        try{
+            
+            // Perform Some Aditional Checks
+            if (reqData['hobby'] === ''){
+                return commonResposes.sendError("Hobby Cannot Be Empty")
+            }
+            
+            // if the User Exceed The Hobby Number Limit
+            const count =  await Database.getRepository(Hobby).countBy({patient:{id:reqData['patientID']}})
+            if (count >= 5 ){
+                return commonResposes.sendError('You Exceeds The Maximum Number of Hobbies (5)')
+            }
+
+            // Check if Hobby is Not Already Exist
+            const checkHobby = await Database.getRepository(Hobby).findOneBy({patient:{id:reqData['patientID']},hobby:reqData['hobby']})
+            if (checkHobby !== null){
+                return commonResposes.sendError("This Hobby Already Exist")
+            }
+
+            // Create New Hobby
+            const newHobby  = new Hobby()
+            newHobby.hobby    = reqData['hobby']
+            newHobby.patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
+
+            // Save it to The DB
+            await Database.getRepository(Hobby).save(newHobby)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Removing Doctor Hobby
+    async DeletePatientHobby(reqData){
+
+        // Check if Parameters Exist
+        if(checkUndefined(reqData,['hobbyID',"patientID"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check if Hobby Even Exist
+            const checkHobby = await Database.getRepository(Hobby).findOneBy({patient:{id:reqData['patientID']},id:reqData['hobbyID']})
+            if (checkHobby === null){
+                return commonResposes.notFound
+            }
+
+            // Remove The Hobby From DB
+            await Database
+            .getRepository(Hobby)
+            .createQueryBuilder('hobby')
+            .delete()
+            .from(Hobby)
+            .where("id = :hobbyID", { hobbyID: reqData['hobbyID'] })
+            .andWhere("patient.id = patientID",{ patientID: reqData['patientID']})
+            .execute()
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+    
 }
 
 export default new profileEditFunctions();
