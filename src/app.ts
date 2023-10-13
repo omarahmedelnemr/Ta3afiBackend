@@ -1,6 +1,7 @@
 import { getCorsAccess } from './Middleware/cors'
 import { Authenticate } from './Middleware/Auth'
-import LoginRouter from "./Server/Login" 
+import AuthRouter from "./Server/Login" 
+import profileRouter from './Server/profileEdits'
 //Main Modules
 var cors = require('cors')
 const express = require('express');
@@ -27,8 +28,17 @@ app.use(express.json());
 app.use(cookieParser());
 app.set("view engine",'ejs')
 
-// Middle API Servers
-app.use("/",LoginRouter)
+///// Middle API Servers
+
+//Authintication
+app.use("/auth",AuthRouter)
+
+// Profile Edits
+app.use("/profile",profileRouter)
+
+
+
+
 
 
 // Base endpoint to Test That API is Working
