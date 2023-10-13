@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne, JoinColumn } from "typeorm"
-import { Doctor } from "../users/Doctor"
+import { Patient } from "../users/Patient"
 
 @Entity()
 @Unique(['id'])
@@ -11,7 +11,7 @@ export class PatientSettings{
     @Column()
     lang:string
     
-    @ManyToOne(()=>Doctor,doctorID=>doctorID.id)
+    @ManyToOne(()=>Patient,patientID=>patientID.id)
     @JoinColumn()
-    doctor:Doctor
+    patient:Patient
 }
