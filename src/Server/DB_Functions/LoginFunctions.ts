@@ -8,9 +8,6 @@ import checkUndefined from "../../middleFunctions/checkUndefined";
 import SendMail from "../../middleFunctions/sendMail";
 import commonResposes from "../../middleFunctions/commonResposes";
 import { ConfirmCode } from "../../entity/login/confirmationCode";
-import { DoctorEducaion } from "../../entity/DoctorInfo/DoctorEducaion";
-import { DoctorExperince } from "../../entity/DoctorInfo/DoctorExperince";
-import { DoctorCertificate } from "../../entity/DoctorInfo/DoctorCertificate";
 const bcrypt = require("bcrypt")
 var jwt = require('jsonwebtoken');
 var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
