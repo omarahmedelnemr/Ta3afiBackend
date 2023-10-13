@@ -3,7 +3,7 @@ import { Doctor } from "../users/Doctor"
 
 @Entity()
 @Unique(['id'])
-export class DoctorEducaion{
+export class DoctorEducation{
     
     @PrimaryGeneratedColumn()
     id:string
