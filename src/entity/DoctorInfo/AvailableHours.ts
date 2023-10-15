@@ -1,21 +1,23 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne, JoinColumn } from "typeorm"
 import { Doctor } from "../users/Doctor"
+import { AvailableDays } from "./AvailableDays"
 
 @Entity()
 @Unique(['id'])
-export class AvilableTimes{
+export class AvailableHour{
     
     @PrimaryGeneratedColumn()
     id:string
 
     @Column()
-    day:string
+    hour:string
 
     @Column()
-    fromHour:string
+    AMPM:string
 
-    @Column()
-    toHour:Date
+    @ManyToOne(()=>AvailableDays,dayID=>dayID.id)
+    @JoinColumn()
+    day:AvailableDays
 
     @ManyToOne(()=>Doctor,doctorID=>doctorID.id)
     @JoinColumn()
