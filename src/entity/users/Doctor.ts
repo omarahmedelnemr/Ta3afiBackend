@@ -24,6 +24,9 @@ export class Doctor{
     @Column()
     description:string
 
+    @Column()
+    online:boolean
+
     @Column({default:0,comment:"The Doctor Rate Percintage to 5 Stars, like: 4.6"})
     starRate:number
 
