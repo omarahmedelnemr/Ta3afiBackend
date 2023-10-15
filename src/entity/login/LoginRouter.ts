@@ -20,4 +20,7 @@ export class LoginRouter{
 
     @Column()
     role:string
+
+    @Column({default:true,comment:"to View Weather the Account is Active or Deleted"})
+    active:boolean
 }
