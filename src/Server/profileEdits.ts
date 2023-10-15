@@ -33,6 +33,12 @@ router.post("/change-password",async (req,res)=>{
 //------------------------------------- Doctor Endpoints --------------------------------------
 //---------------------------------------------------------------------------------------------
 
+// Get Doctor Main Info
+router.get("/doctor-main-Info",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorMainInfo(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
 // Change Doctor's Name
 router.post("/doctor-name-edit",async (req,res)=>{
     const response = await profileEditFunctions.changeDoctorName(req.body)
@@ -57,6 +63,12 @@ router.post("/doctor-description-edit",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Get All Educational Records
+router.get("/doctor-education-record",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorEducationRecords(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
 // Adding New Education Record to a Doctor
 router.post("/doctor-education-record",async (req,res)=>{
     const response = await profileEditFunctions.AddDoctorEducation(req.body)
@@ -66,6 +78,12 @@ router.post("/doctor-education-record",async (req,res)=>{
 // Removeing Education Record for a Doctor
 router.delete("/doctor-education-record",async (req,res)=>{
     const response = await profileEditFunctions.DeleteDoctorEducation(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get All Experince Records
+router.get("/doctor-experince-record",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorExperinceRecords(req.query)
     res.status(response['status']).json(response['data'])
 })
 
@@ -81,6 +99,12 @@ router.delete("/doctor-experince-record",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Get All Certificate Records
+router.get("/doctor-certificate-record",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorCertificateRecords(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
 // Adding New Certificate Record to a Doctor
 router.post("/doctor-certificate-record",async (req,res)=>{
     const response = await profileEditFunctions.AddDoctorCertificate(req.body)
@@ -93,15 +117,9 @@ router.delete("/doctor-certificate-record",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-// Adding New Tag To a Doctor
-router.post("/doctor-tag",async (req,res)=>{
-    const response = await profileEditFunctions.AddDoctorTag(req.body)
-    res.status(response['status']).json(response['data'])
-})
-
-// Removing tag for a Doctor
-router.delete("/doctor-tag",async (req,res)=>{
-    const response = await profileEditFunctions.DeleteDoctorTag(req.body)
+// Getting all Tags for a Doctor
+router.get("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorTags(req.query)
     res.status(response['status']).json(response['data'])
 })
 
@@ -114,12 +132,90 @@ router.post("/doctor-tag",async (req,res)=>{
 // Removing tag for a Doctor
 router.delete("/doctor-tag",async (req,res)=>{
     const response = await profileEditFunctions.DeleteDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Adding New Tag To a Doctor
+router.post("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.AddDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Removing tag for a Doctor
+router.delete("/doctor-tag",async (req,res)=>{
+    const response = await profileEditFunctions.DeleteDoctorTag(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Getting all Doctor Prices Records
+router.get("/doctor-price",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorPriceRanges(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Adding New Price To a Doctor
+router.post("/doctor-price",async (req,res)=>{
+    const response = await profileEditFunctions.AddDoctorPriceRange(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Removing Price for a Doctor
+router.delete("/doctor-price",async (req,res)=>{
+    const response = await profileEditFunctions.DeleteDoctorPriceRange(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Getting All available Times For a Doctor
+router.get("/doctor-available-time",async (req,res)=>{
+    const response = await profileEditFunctions.GetDoctorAvailableTimes(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Adding New Available Time To a Doctor
+router.post("/doctor-available-time",async (req,res)=>{
+    const response = await profileEditFunctions.AddDoctorAvailableTimes(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Removing Available Time for a Doctor
+router.delete("/doctor-available-time",async (req,res)=>{
+    const response = await profileEditFunctions.DeleteDoctorAvailableTimes(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Editing an Available Time for a Doctor
+router.post("/doctor-available-time-edit",async (req,res)=>{
+    const response = await profileEditFunctions.EditDoctorAvailableTimes(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Getting Doctor Current Status
+router.get("/doctor-status",async (req,res)=>{
+    const response = await profileEditFunctions.GetStatus(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Setting Doctor Status To Online or Offline
+router.post("/doctor-status",async (req,res)=>{
+    const response = await profileEditFunctions.SetStatus(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Delete Doctor's Account and It's Related Informamtion
+router.delete("/doctor-account",async (req,res)=>{
+    const response = await profileEditFunctions.DeleteDoctorAccount(req.body)
     res.status(response['status']).json(response['data'])
 })
 
 //---------------------------------------------------------------------------------------------
 //------------------------------------ Patient Endpoints --------------------------------------
 //---------------------------------------------------------------------------------------------
+
+// Get Patient Main Info
+router.get("/patient-main-Info",async (req,res)=>{
+    const response = await profileEditFunctions.GetPatientMainInfo(req.query)
+    res.status(response['status']).json(response['data'])
+})
 
 // Change Doctor's Name
 router.post("/patient-name",async (req,res)=>{
@@ -130,6 +226,12 @@ router.post("/patient-name",async (req,res)=>{
 // Change Patient's Name
 router.post("/patient-birthdate",async (req,res)=>{
     const response = await profileEditFunctions.changePatientBirthDate(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get All Patient Hobbies
+router.get("/patient-hobby",async (req,res)=>{
+    const response = await profileEditFunctions.GetPatientHobbies(req.query)
     res.status(response['status']).json(response['data'])
 })
 
