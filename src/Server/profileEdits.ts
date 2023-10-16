@@ -6,6 +6,8 @@ import profileEditFunctions from './DB_Functions/profileEditFunctions'
 import { Router } from 'express'
 const router = Router()
 
+const path = require('path')
+
 //---------------------------------------------------------------------------------------------
 //------------------------------------- General Endpoints -------------------------------------
 //---------------------------------------------------------------------------------------------
@@ -201,6 +203,12 @@ router.post("/doctor-status",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Setting Doctor Language 
+router.post("/doctor-language",async (req,res)=>{
+    const response = await profileEditFunctions.ChangeDoctorLang(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
 // Delete Doctor's Account and It's Related Informamtion
 router.delete("/doctor-account",async (req,res)=>{
     const response = await profileEditFunctions.DeleteDoctorAccount(req.body)
@@ -246,6 +254,75 @@ router.delete("/patient-hobby",async (req,res)=>{
     const response = await profileEditFunctions.DeletePatientHobby(req.body)
     res.status(response['status']).json(response['data'])
 })
+
+// Get All Patient Diagnoses
+router.get("/patient-diagnose",async (req,res)=>{
+    const response = await profileEditFunctions.GetPatientDiagnoses(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Add New Patient Diagnose
+router.post("/patient-diagnose",async (req,res)=>{
+    const response = await profileEditFunctions.AddPatientDiagnose(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Delete Patient Diagnose
+router.delete("/patient-diagnose",async (req,res)=>{
+    const response = await profileEditFunctions.DeletePatientDiagnose(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get All Patient Medicine
+router.get("/patient-medicine",async (req,res)=>{
+    const response = await profileEditFunctions.GetPatientMedicine(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Add New Patient Medicine
+router.post("/patient-medicine",async (req,res)=>{
+    const response = await profileEditFunctions.AddPatientMedicine(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Delete Patient Medicine
+router.delete("/patient-medicine",async (req,res)=>{
+    const response = await profileEditFunctions.DeletePatientMedicine(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get All Patient Prescription Files
+router.get("/patient-prescription-file",async (req,res)=>{
+    const response = await profileEditFunctions.GetPatientPrescriptionFiles(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Add New Patient Prescription Files
+router.post("/patient-prescription-file",async (req,res)=>{
+    const response = await profileEditFunctions.AddPatientPrescriptionFile(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Delete Patient Prescription Files
+router.delete("/patient-prescription-file",async (req,res)=>{
+    const response = await profileEditFunctions.DeletePatientPrescriptionFile(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Setting Patient Language 
+router.post("/patient-language",async (req,res)=>{
+    const response = await profileEditFunctions.ChangePatientLang(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+
+// Delete Patient Account
+router.delete("/patient-account",async (req,res)=>{
+    const response = await profileEditFunctions.DeletePatientAccount(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+
 
 
 

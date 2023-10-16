@@ -15,6 +15,10 @@ import { Pricing } from "../../entity/DoctorInfo/Pricing";
 import { AvailableDays } from "../../entity/DoctorInfo/AvailableDays";
 import { AvailableHour } from "../../entity/DoctorInfo/AvailableHours";
 import { DoctorSettings } from "../../entity/DoctorInfo/DoctorSettings";
+import { Diagnose } from "../../entity/PatientInfo/Diagnosis";
+import { Medicine } from "../../entity/PatientInfo/Medicine";
+import { PrescriptionFile } from "../../entity/PatientInfo/PrescriptionFile";
+import { PatientSettings } from "../../entity/PatientInfo/PatientSetting";
 const bcrypt = require("bcrypt")
 
 class profileEditFunctions{
@@ -818,6 +822,35 @@ class profileEditFunctions{
         }
     }
 
+    // Change Doctor Language
+    async ChangeDoctorLang(reqData){
+        if(checkUndefined(reqData,["doctorID","lang"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Get Doctor Data
+            const doc = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+            
+            // Check Doctor Existance
+            if (doc === null){
+                return commonResposes.notFound
+            }
+            // Check if it is the Same Lang
+            else if(doc.language === reqData['lang']){
+                return commonResposes.sendError(`The User's Language is Already ${reqData['lang']}`)
+            }
+
+            // Modify the Entity
+            doc.language = reqData['lang']
+            await Database.getRepository(Doctor).save(doc)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
     // Delete Doctor Account
     async DeleteDoctorAccount(reqData){
         if(checkUndefined(reqData,['email',"password"])){
@@ -834,7 +867,11 @@ class profileEditFunctions{
             else if (! await bcrypt.compare(reqData['password'], userLogin['password'])){
                 return commonResposes.wrongPassword
             }
-
+            
+            // Check if the Role is Correct
+            else if (reqData['role'].toLowerCase() !== userLogin.role){
+                return commonResposes.sendError("You Are Not Authenticated")
+            }
             ///// Deleteing Doctor Information
 
             // Remove All Hours Related to The Doctor
@@ -923,6 +960,16 @@ class profileEditFunctions{
             // Change the Account Active Status in Login Router
             userLogin.active = false
             await Database.getRepository(LoginRouter).save(userLogin)
+
+            // Sending After-Delete Email
+            SendMail(reqData['email'],"We're sorry to see you go","\
+            \nYour account has been successfully deleted from our system.\
+            \n\nWe would like to thank you for being a part of our community. Your feedback and interactions have been valuable, and we hope you've had a positive experience with us.\
+            \nIf you have any further questions or need assistance, please don't hesitate to contact our support team at "+process.env.SYSTEM_SUPPORT_EMAIL+". We're here to help.\
+            \nWishing you all the best in your future endeavors.\
+            \n\n\nSincerely,\
+            \nTa3afi Team\
+")
 
             return commonResposes.sendData("The Account is Deleted Successfully")
 
@@ -1088,6 +1135,336 @@ class profileEditFunctions{
             return commonResposes.Error
         }
     }
+
+    // Get All Diagnoses List
+    async GetPatientDiagnoses(reqData){
+        if (checkUndefined(reqData,["patientID"])){
+            return commonResposes.missingParam
+        }
+        try{
+            const diagnoses = await Database.getRepository(Diagnose).findBy({patient:{id:reqData['patientID']}})
+            return commonResposes.sendData(diagnoses)
+
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Patient Add New Patient Diagnose
+    async AddPatientDiagnose(reqData){
+        if (checkUndefined(reqData,["patientID","name","auther","doctorName"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Createing New Diagnose
+            const newDiagnose   = new Diagnose()
+            newDiagnose.name    = reqData['name']
+            newDiagnose.auther  = reqData['auther']
+            newDiagnose.patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
+            newDiagnose.date    = reqData['date'] === undefined? null:new Date(reqData['date'])
+            newDiagnose.doctorName = reqData['doctorName']
+            
+            // Save to DB
+            await Database.getRepository(Diagnose).save(newDiagnose)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    //Remove Patient Diagnose
+    async DeletePatientDiagnose(reqData){
+        if (checkUndefined(reqData,["diagnoseID","role"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check if Diagnose Exist and The User is Autherized
+            const diagnose = await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID']})
+            if (diagnose === null){
+                return commonResposes.notFound
+            }else if(diagnose.auther.toLowerCase() !== reqData['role'].toLowerCase()){
+                return commonResposes.sendError("You Are Not Autherized")
+            }
+
+            // Remove The Diagnose From DB
+            await Database
+            .getRepository(Diagnose)
+            .createQueryBuilder('Diagnose')
+            .delete()
+            .from(Diagnose)
+            .where("id = :diagnoseID", { diagnoseID: reqData['diagnoseID'] })
+            .execute()
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Get All Medicine List
+    async GetPatientMedicine(reqData){
+        if (checkUndefined(reqData,["patientID"])){
+            return commonResposes.missingParam
+        }
+        try{
+            const medicine = await Database.getRepository(Medicine).findBy({patient:{id:reqData['patientID']}})
+            return commonResposes.sendData(medicine)
+
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Patient Add New Patient Medicine
+    async AddPatientMedicine(reqData){
+        if (checkUndefined(reqData,["patientID","name","auther","doctorName","Freq","active"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Createing New Medicine
+            const newMedicine       = new Medicine()
+            newMedicine.name        = reqData['name']
+            newMedicine.auther      = reqData['auther']
+            newMedicine.patient     = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
+            newMedicine.doctorName  = reqData['doctorName']
+            newMedicine.diagnose    = reqData['diagnoseID'] === undefined ? null: await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID']})
+            newMedicine.Freq        = reqData['Freq']
+            newMedicine.active      = reqData['active']
+            newMedicine.startDate   = reqData['startDate'] === undefined? null:new Date(reqData['startDate'])
+            newMedicine.endDate     = reqData['endDate'] === undefined? null:new Date(reqData['endDate'])
+
+            // Save to DB
+            await Database.getRepository(Diagnose).save(newMedicine)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Remove Patient Medicine
+    async DeletePatientMedicine(reqData){
+        if (checkUndefined(reqData,["medicineID","role"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check if Diagnose Exist and The User is Autherized
+            const medicine = await Database.getRepository(Medicine).findOneBy({id:reqData['medicineID']})
+            if (medicine === null){
+                return commonResposes.notFound
+            }else if(medicine.auther.toLowerCase() !== reqData['role'].toLowerCase()){
+                return commonResposes.sendError("You Are Not Autherized")
+            }
+
+            // Remove The Diagnose From DB
+            await Database
+            .getRepository(Medicine)
+            .createQueryBuilder('Medicine')
+            .delete()
+            .from(Medicine)
+            .where("id = :medicineID", { medicineID: reqData['medicineID'] })
+            .execute()
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Get All Prescription List
+    async GetPatientPrescriptionFiles(reqData){
+        if (checkUndefined(reqData,["patientID"])){
+            return commonResposes.missingParam
+        }
+        try{
+            const medicine = await Database.getRepository(PrescriptionFile).findBy({patient:{id:reqData['patientID']}})
+            return commonResposes.sendData(medicine)
+
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Patient Add New Patient Prescription
+    async AddPatientPrescriptionFile(reqData){
+        if (checkUndefined(reqData,["patientID","fileName","auther","doctorName"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Createing New Prescription File
+            const newPrescription       = new PrescriptionFile()
+            newPrescription.file        = reqData['fileName']
+            newPrescription.auther      = reqData['auther']
+            newPrescription.patient     = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
+            newPrescription.doctorName  = reqData['doctorName']
+
+            // Save to DB
+            await Database.getRepository(PrescriptionFile).save(newPrescription)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Remove Patient Prescription
+    async DeletePatientPrescriptionFile(reqData){
+        if (checkUndefined(reqData,["prescriptionID","role"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check if Prescription Exist and The User is Autherized
+            const prescription = await Database.getRepository(PrescriptionFile).findOneBy({id:reqData['prescriptionID']})
+            if (prescription === null){
+                return commonResposes.notFound
+            }else if(prescription.auther.toLowerCase() !== reqData['role'].toLowerCase()){
+                return commonResposes.sendError("You Are Not Autherized")
+            }
+
+            // Remove The Prescription From DB
+            await Database
+            .getRepository(PrescriptionFile)
+            .createQueryBuilder('PrescriptionFile')
+            .delete()
+            .from(PrescriptionFile)
+            .where("id = :prescriptionID", { prescriptionID: reqData['prescriptionID'] })
+            .execute()
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Change Language
+    async ChangePatientLang(reqData){
+        if(checkUndefined(reqData,["patientID","lang"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Get Patient Data
+            const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
+            
+            // Check Patient Existance
+            if (patient === null){
+                return commonResposes.notFound
+            }
+            // Check if it is the Same Lang
+            else if(patient.language === reqData['lang']){
+                return commonResposes.sendError(`The User's Language is Already ${reqData['lang']}`)
+            }
+
+            // Modify the Entity
+            patient.language = reqData['lang']
+            await Database.getRepository(Patient).save(patient)
+
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    //Delete Patient Account
+    async DeletePatientAccount(reqData){
+        if (checkUndefined(reqData,["email","password"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Check User's Credintials
+            const userLogin = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
+            if (userLogin === null){
+                return commonResposes.notFound
+            }
+
+            // check the Password Correctness
+            else if (! await bcrypt.compare(reqData['password'], userLogin['password'])){
+                return commonResposes.wrongPassword
+            }
+
+            // Check if the Role is Correct
+            else if (reqData['role'].toLowerCase() !== userLogin.role){
+                return commonResposes.sendError("You Are Not Authenticated")
+            }
+
+            ///// Deleteing Patient Information
+
+            // Remove The Prescription From DB
+            await Database
+            .getRepository(PrescriptionFile)
+            .createQueryBuilder('PrescriptionFile')
+            .delete()
+            .from(PrescriptionFile)
+            .where("patient.id = :patientID", { patientID: userLogin.userID })
+            .execute()
+
+            // Remove The Settings From DB
+            await Database
+            .getRepository(PatientSettings)
+            .createQueryBuilder('PatientSettings')
+            .delete()
+            .from(PatientSettings)
+            .where("patient.id = :patientID", { patientID: userLogin.userID })
+            .execute()
+
+            // Remove The Hobbies From DB
+            await Database
+            .getRepository(Hobby)
+            .createQueryBuilder('Hobby')
+            .delete()
+            .from(Hobby)
+            .where("patient.id = :patientID", { patientID: userLogin.userID })
+            .execute()
+
+            // Remove The Medicine From DB
+            await Database
+            .getRepository(Medicine)
+            .createQueryBuilder('Medicine')
+            .delete()
+            .from(Medicine)
+            .where("patient.id = :patientID", { patientID: userLogin.userID })
+            .execute()
+
+            // Remove The Diagnose From DB
+            await Database
+            .getRepository(Diagnose)
+            .createQueryBuilder('Diagnose')
+            .delete()
+            .from(Diagnose)
+            .where("patient.id = :patientID", { patientID: userLogin.userID })
+            .execute()
+
+            // Change the Account Active Status in Login Router
+            userLogin.active = false
+            await Database.getRepository(LoginRouter).save(userLogin)
+
+            // Sending After-Delete Email
+            SendMail(reqData['email'],"We're sorry to see you go","\
+            \nYour account has been successfully deleted from our system.\
+            \n\nWe would like to thank you for being a part of our community. Your feedback and interactions have been valuable, and we hope you've had a positive experience with us.\
+            \nIf you have any further questions or need assistance, please don't hesitate to contact our support team at "+process.env.SYSTEM_SUPPORT_EMAIL+". We're here to help.\
+            \nWishing you all the best in your future endeavors.\
+            \n\n\nSincerely,\
+            \nTa3afi Team\
+")
+
+            return commonResposes.sendData("The Account is Deleted Successfully")
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+    
     
 }
 
