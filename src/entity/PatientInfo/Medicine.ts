@@ -16,12 +16,20 @@ export class Medicine{
     @Column({comment:"The Doctor Who Set this Medicine"})
     doctorName:string
 
-    @Column({nullable:true,comment:"The Date of When this Medicine Was Issued, Could Be Null"})
-    date:Date
-
     @Column({comment:"This Column is to Identify Weather this Medicine is Being Set on App By The Patient or By a Doctor"})
     auther:string
+    
+    @Column()
+    Freq:string
 
+    @Column({comment:"Weather the Patient is Still Taking or Not"})
+    active:boolean
+
+    @Column()
+    startDate:Date
+
+    @Column()
+    endDate:Date
 
     @ManyToOne(()=>Patient,patientID=>patientID.id)
     @JoinColumn()
