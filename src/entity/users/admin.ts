@@ -11,4 +11,7 @@ export class Admin{
 
     @Column()
     age: number
+
+    @Column({default:'en'})
+    language:string
 }

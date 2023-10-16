@@ -24,6 +24,9 @@ export class Doctor{
     @Column()
     description:string
 
+    @Column({default:'en'})
+    language:string
+
     @Column()
     online:boolean
 

@@ -14,4 +14,7 @@ export class Patient{
 
     @Column()
     gender: string
+
+    @Column({default:'en'})
+    language:string
 }
