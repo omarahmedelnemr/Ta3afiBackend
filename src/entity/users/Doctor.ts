@@ -27,7 +27,7 @@ export class Doctor{
     @Column({default:'en'})
     language:string
 
-    @Column()
+    @Column({default:true})
     online:boolean
 
     @Column({default:0,comment:"The Doctor Rate Percintage to 5 Stars, like: 4.6"})
