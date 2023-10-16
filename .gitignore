@@ -1,1 +1,5 @@
 /node_modules
+
+
+/src/uploads/pdf/*
+/src/uploads/images/*
