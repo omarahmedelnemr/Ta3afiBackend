@@ -16,6 +16,9 @@ class GenerateResponse{
     sendError(data){
         return {status:406,data:data}
     }
+    custom(status,data){
+        return {status:status,data:data}
+    }
 }
 
 export default new GenerateResponse();
