@@ -51,7 +51,7 @@ app.get('/',async (req,res)=>{
 //---------------------------------------------------------------------------------------------
 
 // Upload Route
-app.post("/Upload",async (req,res)=>{
+app.post("/upload",async (req,res)=>{
     console.log('uploading a File!')
     if (req.files ===null){
         return res.status(400).send('No files were uploaded');
