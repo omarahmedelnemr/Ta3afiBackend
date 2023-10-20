@@ -137,18 +137,6 @@ router.delete("/doctor-tag",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-// Adding New Tag To a Doctor
-router.post("/doctor-tag",async (req,res)=>{
-    const response = await profileEditFunctions.AddDoctorTag(req.body)
-    res.status(response['status']).json(response['data'])
-})
-
-// Removing tag for a Doctor
-router.delete("/doctor-tag",async (req,res)=>{
-    const response = await profileEditFunctions.DeleteDoctorTag(req.body)
-    res.status(response['status']).json(response['data'])
-})
-
 // Getting all Doctor Prices Records
 router.get("/doctor-price",async (req,res)=>{
     const response = await profileEditFunctions.GetDoctorPriceRanges(req.query)
@@ -226,13 +214,13 @@ router.get("/patient-main-Info",async (req,res)=>{
 })
 
 // Change Doctor's Name
-router.post("/patient-name",async (req,res)=>{
+router.post("/patient-name-edit",async (req,res)=>{
     const response = await profileEditFunctions.changePatientName(req.body)
     res.status(response['status']).json(response['data'])
 })
 
 // Change Patient's Name
-router.post("/patient-birthdate",async (req,res)=>{
+router.post("/patient-birthdate-edit",async (req,res)=>{
     const response = await profileEditFunctions.changePatientBirthDate(req.body)
     res.status(response['status']).json(response['data'])
 })

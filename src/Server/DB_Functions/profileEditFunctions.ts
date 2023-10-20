@@ -150,11 +150,11 @@ class profileEditFunctions{
 
     // Change Doctor Name
     async changeDoctorName(reqData){
-        if (checkUndefined(reqData,['id','newName'])){
+        if (checkUndefined(reqData,['doctorID','newName'])){
             return commonResposes.missingParam
         }
         // Get Doctor's Info
-        const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['id']})
+        const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
         if (doctor === undefined){
             return commonResposes.notFound
         }
@@ -170,11 +170,11 @@ class profileEditFunctions{
 
     // Change Doctor Title
     async changeDoctorTitle(reqData){
-        if (checkUndefined(reqData,['id','newTitle'])){
+        if (checkUndefined(reqData,['doctorID','newTitle'])){
             return commonResposes.missingParam
         }
         // Get Doctor's Info
-        const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['id']})
+        const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
         if (doctor === undefined){
             return commonResposes.notFound
         }
@@ -190,12 +190,12 @@ class profileEditFunctions{
     
     // Change Doctor Birth Date
     async changeDoctorBirthDate(reqData){
-        if (checkUndefined(reqData,['id','newBirthDate'])){
+        if (checkUndefined(reqData,['doctorID','newBirthDate'])){
             return commonResposes.missingParam
         }
         try{       
             // Get Doctor's Info
-            const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['id']})
+            const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (doctor === undefined){
                 return commonResposes.notFound
             }
@@ -215,12 +215,12 @@ class profileEditFunctions{
     // Edit Doctor's Description
     async EditDescription(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","newDescription"])){
+        if (checkUndefined(reqData,["doctorID","newDescription"])){
             return commonResposes.missingParam
         }
         try{       
             // Get Doctor's Info
-            const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['id']})
+            const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (doctor === undefined){
                 return commonResposes.notFound
             }
@@ -256,20 +256,16 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Education)
     async AddDoctorEducation(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","title","place","startDate"])){
+        if (checkUndefined(reqData,["doctorID","title","place","startDate"])){
             return commonResposes.missingParam
         }
         try{
 
-            // Gettig the Login Info For Next Steps
-            const LoginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
-            if (LoginInfo === null){
-                return commonResposes.notFound
-            }
-
             // Get Doctors DB Entity
-            const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:LoginInfo.userID})
-                        
+            const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+            if (currentDoctor === null){
+                return commonResposes.notFound
+            }         
             // Adding Doctors Educations
             var newEducation     = new DoctorEducation()
             newEducation.doctor    = currentDoctor
@@ -335,19 +331,15 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Experince)
     async AddDoctorExperince(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","title","place","startDate"])){
+        if (checkUndefined(reqData,["emadoctorIDil","title","place","startDate"])){
             return commonResposes.missingParam
         }
         try{
-
-            // Gettig the Login Info For Next Steps
-            const LoginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
-            if (LoginInfo === null){
+            // Get Doctors DB Entity
+            const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+            if (currentDoctor === null){
                 return commonResposes.notFound
             }
-
-            // Get Doctors DB Entity
-            const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:LoginInfo.userID})
 
             // Adding Doctors Experince
             var newExperince    = new DoctorExperince()
@@ -415,19 +407,15 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Certificate)
     async AddDoctorCertificate(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","title","place","date"])){
+        if (checkUndefined(reqData,["doctorID","title","place","date"])){
             return commonResposes.missingParam
         }
         try{
-
-            // Gettig the Login Info For Next Steps
-            const LoginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
-            if (LoginInfo === null){
+            // Get Doctors DB Entity
+            const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+            if (currentDoctor === null){
                 return commonResposes.notFound
             }
-
-            // Get Doctors DB Entity
-            const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:LoginInfo.userID})
 
             // Adding Doctor Certificate
             var newCertificate     = new DoctorCertificate()
@@ -507,8 +495,8 @@ class profileEditFunctions{
             
             // if the Doctor Exceed The Tag Number Limit
             const count =  await Database.getRepository(DoctorTag).countBy({doctor:{id:reqData['doctorID']}})
-            if (count >= 5 ){
-                return commonResposes.sendError('Doctor Exceeds The Maximum Number of Tags (5)')
+            if (count >= 3 ){
+                return commonResposes.sendError('Doctor Exceeds The Maximum Number of Tags (3)')
             }
 
             // Check if Tag is Not Already Exist
@@ -867,7 +855,7 @@ class profileEditFunctions{
             else if (! await bcrypt.compare(reqData['password'], userLogin['password'])){
                 return commonResposes.wrongPassword
             }
-            
+
             // Check if the Role is Correct
             else if (reqData['role'].toLowerCase() !== userLogin.role){
                 return commonResposes.sendError("You Are Not Authenticated")
@@ -1012,11 +1000,11 @@ class profileEditFunctions{
 
     // Change Patient Name
     async changePatientName(reqData){
-        if (checkUndefined(reqData,['id','newName'])){
+        if (checkUndefined(reqData,['patientID','newName'])){
             return commonResposes.missingParam
         }
         // Get Patinet's Info
-        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['id']})
+        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
         if (patient === undefined){
             return commonResposes.notFound
         }
@@ -1153,14 +1141,14 @@ class profileEditFunctions{
 
     // Patient Add New Patient Diagnose
     async AddPatientDiagnose(reqData){
-        if (checkUndefined(reqData,["patientID","name","auther","doctorName"])){
+        if (checkUndefined(reqData,["patientID","name","doctorName"])){
             return commonResposes.missingParam
         }
         try{
             // Createing New Diagnose
             const newDiagnose   = new Diagnose()
             newDiagnose.name    = reqData['name']
-            newDiagnose.auther  = reqData['auther']
+            newDiagnose.auther  = 'patient'
             newDiagnose.patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newDiagnose.date    = reqData['date'] === undefined? null:new Date(reqData['date'])
             newDiagnose.doctorName = reqData['doctorName']
@@ -1177,12 +1165,12 @@ class profileEditFunctions{
 
     //Remove Patient Diagnose
     async DeletePatientDiagnose(reqData){
-        if (checkUndefined(reqData,["diagnoseID","role"])){
+        if (checkUndefined(reqData,["patientID","diagnoseID","role"])){
             return commonResposes.missingParam
         }
         try{
             // Check if Diagnose Exist and The User is Autherized
-            const diagnose = await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID']})
+            const diagnose = await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID'],patient:{id:reqData['patientID']}})
             if (diagnose === null){
                 return commonResposes.notFound
             }else if(diagnose.auther.toLowerCase() !== reqData['role'].toLowerCase()){
@@ -1222,14 +1210,14 @@ class profileEditFunctions{
 
     // Patient Add New Patient Medicine
     async AddPatientMedicine(reqData){
-        if (checkUndefined(reqData,["patientID","name","auther","doctorName","Freq","active"])){
+        if (checkUndefined(reqData,["patientID","name","doctorName","Freq","active"])){
             return commonResposes.missingParam
         }
         try{
             // Createing New Medicine
             const newMedicine       = new Medicine()
             newMedicine.name        = reqData['name']
-            newMedicine.auther      = reqData['auther']
+            newMedicine.auther      = 'patient'
             newMedicine.patient     = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newMedicine.doctorName  = reqData['doctorName']
             newMedicine.diagnose    = reqData['diagnoseID'] === undefined ? null: await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID']})
@@ -1250,12 +1238,12 @@ class profileEditFunctions{
 
     // Remove Patient Medicine
     async DeletePatientMedicine(reqData){
-        if (checkUndefined(reqData,["medicineID","role"])){
+        if (checkUndefined(reqData,["patientID","medicineID","role"])){
             return commonResposes.missingParam
         }
         try{
             // Check if Diagnose Exist and The User is Autherized
-            const medicine = await Database.getRepository(Medicine).findOneBy({id:reqData['medicineID']})
+            const medicine = await Database.getRepository(Medicine).findOneBy({id:reqData['medicineID'],patient:reqData['patientID']})
             if (medicine === null){
                 return commonResposes.notFound
             }else if(medicine.auther.toLowerCase() !== reqData['role'].toLowerCase()){
@@ -1295,14 +1283,14 @@ class profileEditFunctions{
 
     // Patient Add New Patient Prescription
     async AddPatientPrescriptionFile(reqData){
-        if (checkUndefined(reqData,["patientID","fileName","auther","doctorName"])){
+        if (checkUndefined(reqData,["patientID","fileName","doctorName"])){
             return commonResposes.missingParam
         }
         try{
             // Createing New Prescription File
             const newPrescription       = new PrescriptionFile()
             newPrescription.file        = reqData['fileName']
-            newPrescription.auther      = reqData['auther']
+            newPrescription.auther      = 'patient'
             newPrescription.patient     = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newPrescription.doctorName  = reqData['doctorName']
 
@@ -1318,12 +1306,12 @@ class profileEditFunctions{
 
     // Remove Patient Prescription
     async DeletePatientPrescriptionFile(reqData){
-        if (checkUndefined(reqData,["prescriptionID","role"])){
+        if (checkUndefined(reqData,["patientID","prescriptionID","role"])){
             return commonResposes.missingParam
         }
         try{
             // Check if Prescription Exist and The User is Autherized
-            const prescription = await Database.getRepository(PrescriptionFile).findOneBy({id:reqData['prescriptionID']})
+            const prescription = await Database.getRepository(PrescriptionFile).findOneBy({id:reqData['prescriptionID'],patient:{id:reqData["patientID"]}})
             if (prescription === null){
                 return commonResposes.notFound
             }else if(prescription.auther.toLowerCase() !== reqData['role'].toLowerCase()){
@@ -1467,18 +1455,5 @@ class profileEditFunctions{
     
     
 }
-
-
-//// Template
-// if (checkUndefined(reqData,[])){
-//     return commonResposes.missingParam
-// }
-// try{
-
-
-// }catch(err){
-//     console.log("Error!\n",err)
-//     return commonResposes.Error
-// }
 
 export default new profileEditFunctions();

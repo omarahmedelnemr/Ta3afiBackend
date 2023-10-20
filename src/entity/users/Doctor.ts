@@ -18,9 +18,6 @@ export class Doctor{
     @Column()
     gender: string
 
-    @Column({nullable:true})
-    location: string
-
     @Column()
     description:string
 
