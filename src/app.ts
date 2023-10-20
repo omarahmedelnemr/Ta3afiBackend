@@ -2,6 +2,9 @@ import { getCorsAccess } from './Middleware/cors'
 import { Authenticate } from './Middleware/Auth'
 import AuthRouter from "./Server/Login" 
 import profileRouter from './Server/profileEdits'
+import { Database } from './data-source'
+import { Doctor } from './entity/users/Doctor'
+import { Patient } from './entity/users/Patient'
 //Main Modules
 var cors = require('cors')
 const express = require('express');
@@ -50,7 +53,7 @@ app.get('/',async (req,res)=>{
 //------------------------------ Files Managment Endpoints ------------------------------------
 //---------------------------------------------------------------------------------------------
 
-// Upload Route
+// Upload File Route
 app.post("/upload",async (req,res)=>{
     console.log('uploading a File!')
     if (req.files ===null){
@@ -104,6 +107,44 @@ app.get("/file/:fileName",async (req,res)=>{
     }
 });
 
+// Upload a profile Picture route
+app.post('/uploadProfilePic',Authenticate,getCorsAccess,async (req:any, res:any) => {
+
+    if (!req.files) {
+        return res.status(400).send('No files were uploaded.');
+    }
+    const file = req.files.file;
+
+    const fileType = file.name.split('.')[file.name.split('.').length-1]
+    var filePath = ''
+    if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
+        filePath = 'uploads/profilePics'
+    }else{
+        return res.status("400").json('File Type is Not Supported')
+        
+    }
+    const  d = new Date()
+    const fileName = String(d.getTime())+"."+fileType
+    file.mv(path.join(__dirname, filePath,fileName),async (err:any) => {
+        if (err) {
+            return res.status(500).send(err);
+        }
+
+        return res.status(200).json(fileName);
+    });
+});
+
+// Show  profile Pics route
+app.get('/profilePic/:fileName', (req:any, res:any) => {
+    const fileName = req.params.fileName;
+    const fileType = fileName.split('.')[1]
+    if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
+        const filePath = path.join(__dirname, 'uploads/profilePics', fileName);
+        res.sendFile(filePath);
+    }else{
+        res.status(404).send('File Type Is Not Supported')
+    }
+});
 
 //--------------------------------------------------------------------------------------------------------------------------
 //                                             Testing Functions Section

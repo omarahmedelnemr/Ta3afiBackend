@@ -59,6 +59,12 @@ router.post("/doctor-birthdate-edit",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Change Doctor's Profile Image
+router.post("/doctor-profile-image",async (req,res)=>{
+    const response = await profileEditFunctions.changeDoctorProfileImage(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
 // Change Doctor's Description
 router.post("/doctor-description-edit",async (req,res)=>{
     const response = await profileEditFunctions.EditDescription(req.body)

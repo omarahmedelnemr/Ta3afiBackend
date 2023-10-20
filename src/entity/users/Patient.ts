@@ -12,6 +12,9 @@ export class Patient{
     @Column()
     birthDate: Date
 
+    @Column({default:"default.png"})
+    profileImage:string
+
     @Column()
     gender: string
 

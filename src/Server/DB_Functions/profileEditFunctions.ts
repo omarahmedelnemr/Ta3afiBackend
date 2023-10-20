@@ -212,6 +212,30 @@ class profileEditFunctions{
         }
     }
 
+    // Change Doctor Profile Images
+    async changeDoctorProfileImage(reqData){
+        if (checkUndefined(reqData,['doctorID','imageName'])){
+            return commonResposes.missingParam
+        }
+        try{       
+            // Get Doctor's Info
+            const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+            if (doctor === undefined){
+                return commonResposes.notFound
+            }
+
+            // Change Doctor's Image
+            doctor.profileImage = reqData['imageName']
+
+            // Save Changes To DB
+            await Database.getRepository(Doctor).save(doctor)
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
     // Edit Doctor's Description
     async EditDescription(reqData){
         // Check Parameter Existance
@@ -1038,6 +1062,26 @@ class profileEditFunctions{
         return commonResposes.done
     }
 
+    // Change Patient Profile Image
+    async changePatientProfileImage(reqData){
+        if (checkUndefined(reqData,['id','imageName'])){
+            return commonResposes.missingParam
+        }
+        // Get Patinet's Info
+        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['id']})
+        if (patient === undefined){
+            return commonResposes.notFound
+        }
+
+        // Change Patient's image
+        patient.profileImage = reqData['imageName']
+
+        // Save Changes To DB
+        await Database.getRepository(Patient).save(patient)
+
+        return commonResposes.done
+    }
+    
     // Get all Patient Hobbies
     async GetPatientHobbies(reqData){
         if (checkUndefined(reqData,['patientID'])){

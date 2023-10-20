@@ -15,6 +15,9 @@ export class Doctor{
     @Column()
     birthDate: Date
 
+    @Column({default:"default.png"})
+    profileImage:string
+
     @Column()
     gender: string
 
