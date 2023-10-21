@@ -4,7 +4,8 @@
   "description": "Taafi Medical App Backend Server",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"git pull https://github.com/omarahmedelnemr/Ta3afiBackend.git && npm i && nodemon src/index.ts"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +27,7 @@
     "typescript": "^5.2.2"
   },
   "devDependencies": {
-    "@types/node": "^20.7.2"
+    "@types/node": "^20.7.2",
+    "concurrently": "^8.2.2"
   }
 }
