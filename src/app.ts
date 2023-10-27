@@ -2,9 +2,9 @@ import { getCorsAccess } from './Middleware/cors'
 import { Authenticate } from './Middleware/Auth'
 import AuthRouter from "./Server/Login" 
 import profileRouter from './Server/profileEdits'
-import { Database } from './data-source'
-import { Doctor } from './entity/users/Doctor'
-import { Patient } from './entity/users/Patient'
+import blogRouter from './Server/blog'
+
+
 //Main Modules
 var cors = require('cors')
 const express = require('express');
@@ -38,6 +38,9 @@ app.use("/auth",AuthRouter)
 
 // Profile Edits
 app.use("/profile",profileRouter)
+
+// Blog
+app.use("/blog",blogRouter)
 
 
 
