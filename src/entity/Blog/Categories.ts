@@ -10,4 +10,11 @@ export class Categories{
     @Column()
     category: string
 
+    @Column({comment:"Quick Description of what is this Category Talk About in Brief"})
+    description:string
+
+
+    @Column({default:false,comment:"This Confirm Weather the System Admin Approved the Category or Not"})
+    approved:boolean
+
 }

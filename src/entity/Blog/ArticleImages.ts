@@ -8,8 +8,11 @@ export class ArticleImages{
     @PrimaryGeneratedColumn()
     id:string
 
+    @Column({comment:"The name That Could Be Displayed under the Image Like 'Fig. 1'"})
+    name:string
+
     @Column()
-    imageDir: string
+    link: string
 
     @ManyToOne(()=>Article,ArticleID=>ArticleID.id)
     @JoinColumn()
