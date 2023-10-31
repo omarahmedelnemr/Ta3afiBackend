@@ -309,6 +309,17 @@ router.post("/patient-language",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Get Patient Account Info, Like Hieght, weight, Blood Type and More
+router.get("/patient-account-info",async (req,res)=>{
+    const response = await profileEditFunctions.GetPatientAccountInfo(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Edit Patient Account Info ( Like Hieght, weight, Blood Type and More )
+router.post("/patient-account-info",async (req,res)=>{
+    const response = await profileEditFunctions.EditPatientAccountInfo(req.body)
+    res.status(response['status']).json(response['data'])
+})
 
 // Delete Patient Account
 router.delete("/patient-account",async (req,res)=>{

@@ -8,6 +8,7 @@ import checkUndefined from "../../middleFunctions/checkUndefined";
 import SendMail from "../../middleFunctions/sendMail";
 import commonResposes from "../../middleFunctions/commonResposes";
 import { ConfirmCode } from "../../entity/login/confirmationCode";
+import { PatientAccountInfo } from "../../entity/PatientInfo/patientAccountInfo";
 const bcrypt = require("bcrypt")
 var jwt = require('jsonwebtoken');
 var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
@@ -275,7 +276,12 @@ class LoginFunctions{
             loginInfo.userID = newPatient.id
             await Database.getRepository(LoginRouter).save(loginInfo)
 
-            return commonResposes.done
+            // Create an Empty Account Info
+            const newAccountInfo = new PatientAccountInfo()
+            newAccountInfo.patient = newPatient
+            await Database.getRepository(PatientAccountInfo).save(newAccountInfo)
+
+            return commonResposes.done 
         }catch(err){
             console.log("Error!\n",err)
             return commonResposes.Error

@@ -19,6 +19,7 @@ import { Diagnose } from "../../entity/PatientInfo/Diagnosis";
 import { Medicine } from "../../entity/PatientInfo/Medicine";
 import { PrescriptionFile } from "../../entity/PatientInfo/PrescriptionFile";
 import { PatientSettings } from "../../entity/PatientInfo/PatientSetting";
+import { PatientAccountInfo } from "../../entity/PatientInfo/patientAccountInfo";
 const bcrypt = require("bcrypt")
 
 class profileEditFunctions{
@@ -1400,6 +1401,55 @@ class profileEditFunctions{
             patient.language = reqData['lang']
             await Database.getRepository(Patient).save(patient)
 
+            return commonResposes.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Get Patient Account Info, Like Hieght, weight, Blood Type and More
+    async GetPatientAccountInfo(reqData){
+        // Check Parameter Existence
+        if(checkUndefined(reqData,['patientID'])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Get Patient Account Info
+            const info = await Database.getRepository(PatientAccountInfo).findOneBy({patient:{id:reqData['patientID']}})
+            if (info === null){
+                return commonResposes.sendError("There is an Error in Account Creation, Please re-Create The Account or Contact The Backend")
+            }
+
+            return commonResposes.sendData(info)
+        }catch(err){
+            console.log("Error!\n",err)
+            return commonResposes.Error
+        }
+    }
+
+    // Edit Patient Account Info ( Like Hieght, weight, Blood Type and More )
+    async EditPatientAccountInfo(reqData){
+        if(checkUndefined(reqData,["patientID"])){
+            return commonResposes.missingParam
+        }
+        try{
+            // Get patient Account Info
+            const info = await Database.getRepository(PatientAccountInfo).findOneBy({patient:{id:reqData['patientID']}})
+
+            // Edit Provided Info
+            info.height        = reqData['height']        != undefined ? reqData['height']        :null
+            info.weight        = reqData['weight']        != undefined ? reqData['weight']        :null
+            info.blood         = reqData['blood']         != undefined ? reqData['blood']         :null
+            info.martialStatus = reqData['martialStatus'] != undefined ? reqData['martialStatus'] :null
+            info.alcohol       = reqData['alcohol']       != undefined ? reqData['alcohol']       :null
+            info.drugs         = reqData['drugs']         != undefined ? reqData['drugs']         :null
+            info.religious     = reqData['religious']     != undefined ? reqData['religious']     :null
+            info.religion      = reqData['religion']      != undefined ? reqData['religion']      :null
+
+            // Save Changes to DB
+            await Database.getRepository(PatientAccountInfo).save(info)
+            
             return commonResposes.done
         }catch(err){
             console.log("Error!\n",err)
