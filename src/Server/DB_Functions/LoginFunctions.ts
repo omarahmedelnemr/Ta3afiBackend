@@ -51,6 +51,11 @@ class LoginFunctions{
             return CommonResponse.wrongPassword
         }
 
+        // Check if the Account is Deleted
+        else if(User.active === false){
+            return commonResposes.custom(403,"This Account Was Deleted, Please Create New Account")
+        }
+
         // Build The JWT and Return User's Info
         try{
             var userInfo;
@@ -94,15 +99,17 @@ class LoginFunctions{
         }
         try{
             // Check if the Email Already in User
-            const checkExist = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
-            if (checkExist !== null){
+            const checkExist = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email'],active:true})
+            if (checkExist !== null ){
                 return commonResposes.alreadyExist
-            }   
+            }
             
             // Create New Login Route with Role Check
-            const newLoginRouter    = new LoginRouter()
-            newLoginRouter.email    = reqData['email']
-            newLoginRouter.password = await  bcrypt.hash(reqData['password'],10)
+            const newLoginRouter     = new LoginRouter()
+            newLoginRouter.email     = reqData['email']
+            newLoginRouter.password  = await  bcrypt.hash(reqData['password'],10)
+            newLoginRouter.active    = true
+            newLoginRouter.confirmed = false
             if (reqData['role'].toLowerCase() === 'doctor' || reqData['role'].toLowerCase() === 'patient'){
                 newLoginRouter.role     = reqData["role"].toLowerCase()
             }else{
