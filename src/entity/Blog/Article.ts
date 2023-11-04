@@ -12,7 +12,7 @@ export class Article{
     @Column()
     title:string
 
-    @Column({comment:"The image that is Displayed on the List Page or int the Post Page"})
+    @Column({nullable:true,comment:"The image that is Displayed on the List Page or int the Post Page"})
     covorImage:string
 
     @Column()
@@ -21,6 +21,8 @@ export class Article{
     @Column()
     date:Date
 
+    @Column({default:0})
+    views:number
 
     @ManyToOne(()=>Categories,categoryD=>categoryD.id)
     @JoinColumn()
