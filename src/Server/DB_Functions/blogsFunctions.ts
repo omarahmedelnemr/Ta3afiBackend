@@ -256,6 +256,11 @@ class BlogFunctions{
             newArticle.doctor     = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             newArticle.category   = await Database.getRepository(Categories).findOneBy({id:reqData['categoryID']})
 
+            // check if The Data was Missing
+            if(newArticle.doctor === null || newArticle.category === null){
+                return responseGenerater.custom(403,"The Data you Entered is Wrong")
+            }
+
             // Saveing Article Images
             if (reqData['attachedImage'] !== undefined){
                 for(var image of reqData['attachedImage']){
