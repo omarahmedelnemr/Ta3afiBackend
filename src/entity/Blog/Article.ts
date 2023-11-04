@@ -24,6 +24,9 @@ export class Article{
     @Column({default:0})
     views:number
 
+    @Column({default:false})
+    edited:boolean
+
     @ManyToOne(()=>Categories,categoryD=>categoryD.id)
     @JoinColumn()
     category:Categories

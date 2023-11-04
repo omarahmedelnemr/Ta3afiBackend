@@ -301,6 +301,7 @@ class BlogFunctions{
             article.date       = reqData['date']
             article.title      = reqData['title']
             article.mainText   = reqData['mainText']
+            article.edited     = true
             
             // Save Changes To Database
             await Database.getRepository(Article).save(article)
