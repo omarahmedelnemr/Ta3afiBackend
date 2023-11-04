@@ -24,14 +24,20 @@ router.get("/article-list",async (req,res)=>{
 })
 
 // Get a Single Article with Details
+router.get("/article-by-name",async (req,res)=>{
+    const response = await blogsFunctions.SearchForArticleByName(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get a Single Article with Details
 router.get("/article",async (req,res)=>{
     const response = await blogsFunctions.ViewAnArticle(req.query)
     res.status(response['status']).json(response['data'])
 })
 
-// Get a Single Article with Details
-router.get("/article-by-name",async (req,res)=>{
-    const response = await blogsFunctions.SearchForArticleByName(req.query)
+// Get Comments List For an Article
+router.get("/comment-list",async (req,res)=>{
+    const response = await blogsFunctions.GetArticleComments(req.query)
     res.status(response['status']).json(response['data'])
 })
 
@@ -101,12 +107,6 @@ router.delete("/patient-upvote-article",async (req,res)=>{
 //----------------------------------- Article Comments --------------------------------------
 //-------------------------------------------------------------------------------------------
 
-// Get Comments List For an Article
-router.get("/comment-list",async (req,res)=>{
-    const response = await blogsFunctions.GetArticleComments(req.query)
-    res.status(response['status']).json(response['data'])
-})
-
 // Doctor add Comment to an Article
 router.post("/doctor-comment",async (req,res)=>{
     const response = await blogsFunctions.DoctorAddComment(req.body)
@@ -135,6 +135,7 @@ router.delete("/doctor-comment-like",async (req,res)=>{
 //---------------------------------- Article Saved List -------------------------------------
 //-------------------------------------------------------------------------------------------
 
+
 // Patient Get his Saved List
 router.get("/saved-list",async (req,res)=>{
     const response = await blogsFunctions.GetAllSavedList(req.query)
@@ -152,6 +153,4 @@ router.delete("/save-article",async (req,res)=>{
     const response = await blogsFunctions.RemoveArticleFromSavedList(req.body)
     res.status(response['status']).json(response['data'])
 })
-
-
 export default router
