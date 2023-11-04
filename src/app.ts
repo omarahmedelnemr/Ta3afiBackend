@@ -3,6 +3,7 @@ import { Authenticate } from './Middleware/Auth'
 import AuthRouter from "./Server/Login" 
 import profileRouter from './Server/profileEdits'
 import blogRouter from './Server/blog'
+import communityRouter from './Server/community'
 
 
 //Main Modules
@@ -42,7 +43,8 @@ app.use("/profile",profileRouter)
 // Blog
 app.use("/blog",blogRouter)
 
-
+// Community Posts
+app.use("/community",communityRouter)
 
 
 
