@@ -4,7 +4,7 @@ import { Article } from "./Article"
 
 @Entity()
 @Unique(['id'])
-export class SevedArticle{
+export class SavedArticle{
     
     @PrimaryGeneratedColumn()
     id:string
