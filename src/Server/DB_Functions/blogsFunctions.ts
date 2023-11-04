@@ -97,8 +97,8 @@ class BlogFunctions{
     }
     
     // Search for an Article By Name
-    async SearchForArticleByName(reqData){
-        if (checkUndefined(reqData,['searchName'])){
+    async SearchForArticleByTitle(reqData){
+        if (checkUndefined(reqData,['searchTitle'])){
             return responseGenerater.missingParam
         }
         try{
@@ -106,7 +106,7 @@ class BlogFunctions{
             .createQueryBuilder("article")
             .innerJoinAndSelect("article.doctor","doctor")
             .innerJoinAndSelect("article.category","category")
-            .where("article.title like :searchName" ,{searchName:"%"+reqData['searchName']+"%"})
+            .where("article.title like :searchTitle" ,{searchTitle:"%"+reqData['searchTitle']+"%"})
             .select([
                 "article.id as id",
                 "article.title as title",

@@ -23,9 +23,9 @@ router.get("/article-list",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-// Get a Single Article with Details
-router.get("/article-by-name",async (req,res)=>{
-    const response = await blogsFunctions.SearchForArticleByName(req.query)
+// Search for Articles By Using its Title
+router.get("/article-by-title",async (req,res)=>{
+    const response = await blogsFunctions.SearchForArticleByTitle(req.query)
     res.status(response['status']).json(response['data'])
 })
 
