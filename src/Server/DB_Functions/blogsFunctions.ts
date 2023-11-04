@@ -480,7 +480,7 @@ class BlogFunctions{
             .delete()
             .from(Article)
             .where("id = :articleID", { articleID: reqData['articleID'] })
-            .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
+            .andWhere("doctor.id = :doctorID",{ doctorID: reqData['doctorID']})
             .execute()
 
             return responseGenerater.done
