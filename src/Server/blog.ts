@@ -17,7 +17,7 @@ router.get("/category-list",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-// Search For all Posts Using category Delete a Comment like
+// Search For all Posts Using category
 router.get("/article-list",async (req,res)=>{
     const response = await blogsFunctions.GetAllArticleList(req.query)
     res.status(response['status']).json(response['data'])
