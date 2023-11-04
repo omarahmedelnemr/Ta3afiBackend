@@ -24,6 +24,9 @@ export class Post{
     @Column({default:false})
     edited:boolean
 
+    @Column({default:false})
+    hideIdentity:boolean
+
     @ManyToOne(()=>Community,communityID=>communityID.id)
     @JoinColumn()
     community:Community
