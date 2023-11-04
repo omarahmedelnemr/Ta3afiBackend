@@ -56,6 +56,7 @@ class BlogFunctions{
                     "doctor.starRate",
                     "doctor.sessionsNumber"
                 ])
+                .orderBy('article.date', 'DESC')
                 .getRawMany()
             }
 
@@ -224,6 +225,7 @@ class BlogFunctions{
                 "doctor.starRate as doctorStarRate",
                 "doctor.sessionsNumber as doctorSessionNumber"
             ])
+            .orderBy('article.date', 'DESC')
             .getRawMany()
 
             // Adding the Up-Thumbs Votes and seen Count
@@ -588,6 +590,7 @@ class BlogFunctions{
             .createQueryBuilder("Comment")
             .innerJoinAndSelect("Comment.doctor","doctor")
             .where("Comment.article = :articleID",{articleID:reqData['articleID']})
+            .orderBy('Comment.date', 'DESC')
             .getMany()
 
             for (var i=0;i< commmentList.length;i++){
@@ -796,6 +799,7 @@ class BlogFunctions{
                 "doctor.starRate as doctorStarRate",
                 "doctor.sessionsNumber as doctorSessionNumber"
             ])
+            .orderBy('article.date', 'DESC')
             .getRawMany()
 
             // Adding the Up-Thumbs Votes and seen Count
