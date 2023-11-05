@@ -35,6 +35,9 @@ class BlogFunctions{
 
     // Get all Articles With a Category or Not
     async GetAllArticleList(reqData){
+        if (checkUndefined(reqData,['loadBlock'])){
+            return responseGenerater.missingParam
+        }
         try{
             var allArticles;
 
@@ -58,6 +61,8 @@ class BlogFunctions{
                     "doctor.sessionsNumber as doctorSessionNumber"
                 ])
                 .orderBy('article.date', 'DESC')
+                .limit(15)
+                .offset(15* (Number(reqData['loadBlock'])-1))
                 .getRawMany()
             }
 
@@ -81,6 +86,9 @@ class BlogFunctions{
                     "doctor.starRate as doctorStarRate",
                     "doctor.sessionsNumber as doctorSessionNumber"
                 ])
+                .orderBy('article.date', 'DESC')
+                .limit(15)
+                .offset(15* (Number(reqData['loadBlock'])-1))
                 .getRawMany()
             }
 
@@ -98,7 +106,7 @@ class BlogFunctions{
     
     // Search for an Article By Name
     async SearchForArticleByTitle(reqData){
-        if (checkUndefined(reqData,['searchTitle'])){
+        if (checkUndefined(reqData,['searchTitle',"loadBlock"])){
             return responseGenerater.missingParam
         }
         try{
@@ -120,6 +128,9 @@ class BlogFunctions{
                 "doctor.starRate as doctorStarRate",
                 "doctor.sessionsNumber as doctorSessionNumber"
             ])
+            .orderBy('article.date', 'DESC')
+            .limit(15)
+            .offset(15* (Number(reqData['loadBlock'])-1))
             .getRawMany()
 
             return responseGenerater.sendData(allArticles)
@@ -191,7 +202,7 @@ class BlogFunctions{
 
     // Get All Article Comments
     async GetArticleComments(reqData){
-        if(checkUndefined(reqData,['articleID'])){
+        if(checkUndefined(reqData,['articleID',"loadBlock"])){
             return  responseGenerater.missingParam
         }
         try{
@@ -210,6 +221,8 @@ class BlogFunctions{
                 "doctor.sessionsNumber as doctorSessionNumber"
             ])
             .orderBy('Comment.date', 'DESC')
+            .limit(15)
+            .offset(15* (Number(reqData['loadBlock'])-1))
             .getRawMany()
 
             for (var i=0;i< commmentList.length;i++){
@@ -268,7 +281,7 @@ class BlogFunctions{
     // Get all Articles Related to a Doctor
     async GetDoctorArticleList(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['doctorID'])){
+        if (checkUndefined(reqData,['doctorID',"loadBlock"])){
             return responseGenerater.missingParam
         }
         try{
@@ -292,6 +305,8 @@ class BlogFunctions{
                 "doctor.sessionsNumber as doctorSessionNumber"
             ])
             .orderBy('article.date', 'DESC')
+            .limit(15)
+            .offset(15* (Number(reqData['loadBlock'])-1))
             .getRawMany()
 
             // Adding the Up-Thumbs Votes and seen Count
@@ -825,7 +840,7 @@ class BlogFunctions{
 
     // Patient Saving this Article in Saved List
     async GetAllSavedList(reqData){
-        if (checkUndefined(reqData,['patientID'])){
+        if (checkUndefined(reqData,['patientID',"loadBlock"])){
             return responseGenerater.missingParam
         }
         try{
@@ -850,6 +865,8 @@ class BlogFunctions{
                 "doctor.sessionsNumber as doctorSessionNumber"
             ])
             .orderBy('article.date', 'DESC')
+            .limit(15)
+            .offset(15* (Number(reqData['loadBlock'])-1))
             .getRawMany()
 
             // Adding the Up-Thumbs Votes and seen Count
