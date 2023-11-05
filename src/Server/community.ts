@@ -35,12 +35,6 @@ router.get("/patient-posts",async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-// Get Comments List For an post
-router.get("/comment-list",async (req,res)=>{
-    const response = await CommunityFunctions.GetPostComments(req.query)
-    res.status(response['status']).json(response['data'])
-})
-
 //-------------------------------------------------------------------------------------------
 //-------------------------------------- Post Edits -----------------------------------------
 //-------------------------------------------------------------------------------------------
@@ -76,6 +70,12 @@ router.post("/post-reaction",async (req,res)=>{
 // Remove a Reaction from a Post
 router.delete("/post-reaction",async (req,res)=>{
     const response = await CommunityFunctions.RemoveReactOnPost(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get Comments List For an post
+router.get("/comment-list",async (req,res)=>{
+    const response = await CommunityFunctions.GetPostComments(req.query)
     res.status(response['status']).json(response['data'])
 })
 

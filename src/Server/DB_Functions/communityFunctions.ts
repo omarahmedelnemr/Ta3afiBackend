@@ -153,46 +153,6 @@ class CommunityFunctions{
 
     }
 
-    // Get All Post Comments
-    async GetPostComments(reqData){
-        if(checkUndefined(reqData,['postID','loadBlock'])){
-            return  responseGenerater.missingParam
-        }
-        try{
-            const commmentList = await Database.getRepository(PostComment)
-            .createQueryBuilder("Comment")
-            .innerJoinAndSelect("Comment.patient","patient")
-            .where("Comment.post = :postID",{postID:reqData['postID']})
-            .select([
-                "Comment.id as id",
-                "Comment.comment as comment",
-                "Comment.date as date",
-                "patient.name as patientName",
-                "patient.profileImage as patientProfileImage",
-            ])
-            .orderBy('Comment.date', 'DESC')
-            .limit(15)
-            .offset(15* (Number(reqData['loadBlock'])-1))
-            .getRawMany()
-
-            for (var i=0;i< commmentList.length;i++){
-                commmentList[i]['reactions'] = await Database.getRepository(PostCommentsReaction)
-                .createQueryBuilder('comment')
-                .where("comment.id = :commentID",{commentID:commmentList[i].id})
-                .groupBy("comment.reaction")
-                .select(['comment.reaction as reaction'])
-                .addSelect("COUNT(*)",'count')
-                .getRawMany()
-                
-            }
-
-            return responseGenerater.sendData(commmentList)
-        }catch(err){
-            console.log("Error!\n",err)
-            return responseGenerater.Error
-        }
-    }
-
     // Get a User's Post That He Posts
     async GetPatientPosts(reqData){
         if(checkUndefined(reqData,['patientID',"loadBlock"])){
@@ -441,7 +401,7 @@ class CommunityFunctions{
 
     // Patient can Remove React on a Post
     async RemoveReactOnPost(reqData){
-        if(checkUndefined(reqData,['patientID',"postID","reaction"])){
+        if(checkUndefined(reqData,['patientID',"postID"])){
             return  responseGenerater.missingParam
         }
         try{
@@ -469,6 +429,47 @@ class CommunityFunctions{
         }
     }
 
+    // Get All Post Comments
+    async GetPostComments(reqData){
+        if(checkUndefined(reqData,['postID','loadBlock'])){
+            return  responseGenerater.missingParam
+        }
+        try{
+            const commmentList = await Database.getRepository(PostComment)
+            .createQueryBuilder("Comment")
+            .innerJoinAndSelect("Comment.patient","patient")
+            .where("Comment.post = :postID",{postID:reqData['postID']})
+            .select([
+                "Comment.id as id",
+                "Comment.comment as comment",
+                "Comment.date as date",
+                "patient.id as patientID",
+                "patient.name as patientName",
+                "patient.profileImage as patientProfileImage",
+            ])
+            .orderBy('Comment.date', 'DESC')
+            .limit(15)
+            .offset(15* (Number(reqData['loadBlock'])-1))
+            .getRawMany()
+
+            for (var i=0;i< commmentList.length;i++){
+                commmentList[i]['reactions'] = await Database.getRepository(PostCommentsReaction)
+                .createQueryBuilder('comment')
+                .where("comment.id = :commentID",{commentID:commmentList[i].id})
+                .groupBy("comment.reaction")
+                .select(['comment.reaction as reaction'])
+                .addSelect("COUNT(*)",'count')
+                .getRawMany()
+                
+            }
+
+            return responseGenerater.sendData(commmentList)
+        }catch(err){
+            console.log("Error!\n",err)
+            return responseGenerater.Error
+        }
+    }
+
     // Patient Can Comment on a Post
     async AddComment(reqData){
         if(checkUndefined(reqData,['patientID',"postID","comment","date"])){
@@ -476,7 +477,7 @@ class CommunityFunctions{
         }
         try{
             // Get the Patient and Post Info
-            const patientInfo = await Database.getRepository(Patient).findOneBy({id:reqData['doctorIpatientIDD']})
+            const patientInfo = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             const postInfo = await Database.getRepository(Post).findOneBy({id:reqData['postID']})
             
             // Check if Eny Thing is Missing
