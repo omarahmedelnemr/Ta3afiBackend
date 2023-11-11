@@ -43,6 +43,7 @@ class LoginFunctions{
 
         // Check if the User Exist
         const User = await Database.getRepository(LoginRouter).findOneBy({email:loginData['email']})
+        console.log("User: ",User)
         if (User === null){
             return CommonResponse.notFound
         }
@@ -67,11 +68,7 @@ class LoginFunctions{
                 userInfo = await Database.getRepository(Doctor).findOneBy({id:User['userID']})
             }else if (User['role'].toLowerCase() === "admin"){
                 userInfo = await Database.getRepository(Admin).findOneBy({id:User['userID']})
-            }else{
-
-                return commonResposes.sendError("The Role You Entered is Wrong")
             }
-
             const JWTInfo = {
                 "id":User['userID'],
                 'email':User['email'],
