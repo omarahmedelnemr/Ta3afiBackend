@@ -51,7 +51,7 @@ class LoginFunctions{
             return CommonResponse.wrongPassword
         }
 
-        // Check if the Account is Deleted
+        // Check if the Account is Deleted or Not Completed
         else if(User.active === false){
             return commonResposes.sendError("This Account Was Deleted, Please Create New Account")
         }else if (User.userID === -1 ){
