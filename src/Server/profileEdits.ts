@@ -13,7 +13,7 @@ const path = require('path')
 //---------------------------------------------------------------------------------------------
 
 // Send a Confirmation Code for Change The Email Used in Login Proccess for Both Doctor and Patient
-router.post("/send-confirmation-code",async (req,res)=>{
+router.post("/change-email",async (req,res)=>{
     const response = await LoginFunctions.SendConfirmCode(req.body)
     res.status(response['status']).json(response['data'])
 })

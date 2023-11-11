@@ -835,7 +835,7 @@ class profileEditFunctions{
 
     // Change Doctor Language
     async ChangeDoctorLang(reqData){
-        if(checkUndefined(reqData,["doctorID","lang"])){
+        if(checkUndefined(reqData,["doctorID","language"])){
             return commonResposes.missingParam
         }
         try{
@@ -847,12 +847,12 @@ class profileEditFunctions{
                 return commonResposes.notFound
             }
             // Check if it is the Same Lang
-            else if(doc.language === reqData['lang']){
-                return commonResposes.sendError(`The User's Language is Already ${reqData['lang']}`)
+            else if(doc.language === reqData['language']){
+                return commonResposes.sendError(`The User's Language is Already ${reqData['language']}`)
             }
 
             // Modify the Entity
-            doc.language = reqData['lang']
+            doc.language = reqData['language']
             await Database.getRepository(Doctor).save(doc)
 
             return commonResposes.done
@@ -1368,7 +1368,7 @@ class profileEditFunctions{
 
     // Change Language
     async ChangePatientLang(reqData){
-        if(checkUndefined(reqData,["patientID","lang"])){
+        if(checkUndefined(reqData,["patientID","language"])){
             return commonResposes.missingParam
         }
         try{
@@ -1380,12 +1380,12 @@ class profileEditFunctions{
                 return commonResposes.notFound
             }
             // Check if it is the Same Lang
-            else if(patient.language === reqData['lang']){
-                return commonResposes.sendError(`The User's Language is Already ${reqData['lang']}`)
+            else if(patient.language === reqData['language']){
+                return commonResposes.sendError(`The User's Language is Already ${reqData['language']}`)
             }
 
             // Modify the Entity
-            patient.language = reqData['lang']
+            patient.language = reqData['language']
             await Database.getRepository(Patient).save(patient)
 
             return commonResposes.done
