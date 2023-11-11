@@ -75,7 +75,7 @@ class LoginFunctions{
             const JWTInfo = {
                 "id":User['userID'],
                 'email':User['email'],
-                "password":User['password']
+                "role":User['role']
             }
 
             //Generat JWT That Last For 10 Days
