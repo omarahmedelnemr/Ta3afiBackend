@@ -67,7 +67,11 @@ class LoginFunctions{
                 userInfo = await Database.getRepository(Doctor).findOneBy({id:User['userID']})
             }else if (User['role'].toLowerCase() === "admin"){
                 userInfo = await Database.getRepository(Admin).findOneBy({id:User['userID']})
+            }else{
+
+                return commonResposes.sendError("The Role You Entered is Wrong")
             }
+
             const JWTInfo = {
                 "id":User['userID'],
                 'email':User['email'],
