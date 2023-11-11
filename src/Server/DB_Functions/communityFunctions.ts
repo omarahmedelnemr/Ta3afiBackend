@@ -97,6 +97,12 @@ class CommunityFunctions{
                 .select(['PostReaction.reaction as reaction'])
                 .addSelect("COUNT(*)",'count')
                 .getRawMany()
+
+                // Remove Identitity if hideIdentity
+                if (allPosts[i]['hideIdentity'] === 1){
+                    allPosts[i]['userName'] = null
+                    allPosts[i]['userProfileImage'] = null
+                }
             }
             return responseGenerater.sendData(allPosts)
         }catch(err){
@@ -124,6 +130,7 @@ class CommunityFunctions{
                 "Post.views as views",
                 "Post.edited as edited",
                 "Post.mainText as mainText",
+                "Post.hideIdentity as hideIdentity",
                 "community.name as community",
                 "patient.name as userName",
                 "patient.profileImage as userProfileImage",
@@ -144,6 +151,12 @@ class CommunityFunctions{
                 .select(['PostReaction.reaction as reaction'])
                 .addSelect("COUNT(*)",'count')
                 .getRawMany()
+
+                // Remove Identitity if hideIdentity
+                if (allPosts[i]['hideIdentity'] === 1){
+                    allPosts[i]['userName'] = null
+                    allPosts[i]['userProfileImage'] = null
+                }
             }
             return responseGenerater.sendData(allPosts)
         }catch(err){
@@ -192,6 +205,12 @@ class CommunityFunctions{
                 .select(['PostReaction.reaction as reaction'])
                 .addSelect("COUNT(*)",'count')
                 .getRawMany()
+
+                // Remove Identitity if hideIdentity
+                if (allPosts[i]['hideIdentity'] === 1){
+                    allPosts[i]['userName'] = null
+                    allPosts[i]['userProfileImage'] = null
+                }
             }
             return responseGenerater.sendData(allPosts)
         }catch(err){
@@ -656,6 +675,13 @@ class CommunityFunctions{
                 .getRawMany()
 
 
+            // Remove Identitity if hideIdentity
+            for(var i =0;i<postList.length;i++){
+                if (postList[i]['hideIdentity'] === 1){
+                    postList[i]['userName'] = null
+                    postList[i]['userProfileImage'] = null
+                }
+            }
             return responseGenerater.sendData(postList)
 
         }catch(err){
