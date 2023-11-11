@@ -43,7 +43,6 @@ class LoginFunctions{
 
         // Check if the User Exist
         const User = await Database.getRepository(LoginRouter).findOneBy({email:loginData['email']})
-        console.log("User: ",User)
         if (User === null){
             return CommonResponse.notFound
         }
@@ -54,13 +53,15 @@ class LoginFunctions{
 
         // Check if the Account is Deleted
         else if(User.active === false){
-            return commonResposes.custom(403,"This Account Was Deleted, Please Create New Account")
+            return commonResposes.sendError("This Account Was Deleted, Please Create New Account")
+        }else if (User.userID === -1 ){
+            return commonResposes.sendError("Your Account is Not Complete Yet, Please Complete and Try Again")
         }
 
         // Build The JWT and Return User's Info
         try{
             var userInfo;
-
+            
             // CHeck Users Role
             if (User['role'].toLowerCase() === 'patient'){
                 userInfo = await Database.getRepository(Patient).findOneBy({id:User['userID']})
@@ -69,6 +70,8 @@ class LoginFunctions{
             }else if (User['role'].toLowerCase() === "admin"){
                 userInfo = await Database.getRepository(Admin).findOneBy({id:User['userID']})
             }
+
+            
             const JWTInfo = {
                 "id":User['userID'],
                 'email':User['email'],
