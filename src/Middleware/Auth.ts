@@ -10,11 +10,11 @@ export async function Authenticate(req,res,next){
     // try{
     //     const jwtData = await jwt.verify(token,process.env.JWTsecret)
 
-    //     // if (jwtData['role'] !== userRole){
-    //     //     res.status(401).json("unauthorized")
-    //     // }else{
-    //     //     next()
-    //     // }
+    //     if (jwtData['role'] !== userRole){
+    //         res.status(401).json("unauthorized")
+    //     }else{
+    //         next()
+    //     }
     // }catch{
     //      res.status(401).json("unauthorized")
          
