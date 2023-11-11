@@ -135,7 +135,9 @@ class profileEditFunctions{
             }
 
             const getEmail = await Database.getRepository(LoginRouter).findOneBy({userID:reqData['doctorID'],role:"doctor"})
-
+            if (getEmail === null){
+                return commonResposes.custom(403,"The Account Data is Missing, Please Contact Support")
+            }
             doctorMain['email'] = getEmail.email
 
             return commonResposes.sendData(doctorMain)
