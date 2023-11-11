@@ -14,4 +14,7 @@ export class Admin{
 
     @Column({default:'en'})
     language:string
+
+    @Column({default:"default.png"})
+    profileImage:string
 }

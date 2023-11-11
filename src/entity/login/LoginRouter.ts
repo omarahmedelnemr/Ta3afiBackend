@@ -12,9 +12,6 @@ export class LoginRouter{
     @Column({default:false,comment:"Check if the Email is Confirmed"})
     confirmed:boolean
 
-    @Column({default:false,comment:"this Descriptes if the User Completed Signing up Proccess and Information"})
-    completeInfo:boolean
-
     @Column()
     userID:number
 

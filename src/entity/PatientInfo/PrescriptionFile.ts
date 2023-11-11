@@ -9,7 +9,7 @@ export class PrescriptionFile{
     @PrimaryGeneratedColumn()
     id:string
 
-    @Column({comment:"The Name of the File"})
+    @Column({comment:"The Name or the Path of the File"})
     file:string
 
     @Column({nullable:true,comment:"The Doctor Who Set this Prescription"})

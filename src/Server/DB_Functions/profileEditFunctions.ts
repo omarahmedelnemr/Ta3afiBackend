@@ -14,11 +14,9 @@ import { Hobby } from "../../entity/PatientInfo/hobby";
 import { Pricing } from "../../entity/DoctorInfo/Pricing";
 import { AvailableDays } from "../../entity/DoctorInfo/AvailableDays";
 import { AvailableHour } from "../../entity/DoctorInfo/AvailableHours";
-import { DoctorSettings } from "../../entity/DoctorInfo/DoctorSettings";
 import { Diagnose } from "../../entity/PatientInfo/Diagnosis";
 import { Medicine } from "../../entity/PatientInfo/Medicine";
 import { PrescriptionFile } from "../../entity/PatientInfo/PrescriptionFile";
-import { PatientSettings } from "../../entity/PatientInfo/PatientSetting";
 import { PatientAccountInfo } from "../../entity/PatientInfo/patientAccountInfo";
 const bcrypt = require("bcrypt")
 
@@ -951,16 +949,6 @@ class profileEditFunctions{
             .where("doctor.id = :doctorID", { doctorID: userLogin.userID })
             .execute()
 
-            
-            // Remove All Settings to The Doctor
-            await Database
-            .getRepository(DoctorSettings)
-            .createQueryBuilder('DoctorSettings')
-            .delete()
-            .from(DoctorSettings)
-            .where("doctor.id = :doctorID", { doctorID: userLogin.userID })
-            .execute()
-
             // Remove Main Info Related to The Doctor
             await Database
             .getRepository(Doctor)
@@ -1255,7 +1243,7 @@ class profileEditFunctions{
 
     // Patient Add New Patient Medicine
     async AddPatientMedicine(reqData){
-        if (checkUndefined(reqData,["patientID","name","doctorName","Freq","active"])){
+        if (checkUndefined(reqData,["patientID","name","doctorName","freq","active"])){
             return commonResposes.missingParam
         }
         try{
@@ -1265,8 +1253,7 @@ class profileEditFunctions{
             newMedicine.auther      = 'patient'
             newMedicine.patient     = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newMedicine.doctorName  = reqData['doctorName']
-            newMedicine.diagnose    = reqData['diagnoseID'] === undefined ? null: await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID']})
-            newMedicine.Freq        = reqData['Freq']
+            newMedicine.freq        = reqData['freq']
             newMedicine.active      = reqData['active']
             newMedicine.startDate   = reqData['startDate'] === undefined? null:new Date(reqData['startDate'])
             newMedicine.endDate     = reqData['endDate'] === undefined? null:new Date(reqData['endDate'])
@@ -1487,15 +1474,6 @@ class profileEditFunctions{
             .createQueryBuilder('PrescriptionFile')
             .delete()
             .from(PrescriptionFile)
-            .where("patient.id = :patientID", { patientID: userLogin.userID })
-            .execute()
-
-            // Remove The Settings From DB
-            await Database
-            .getRepository(PatientSettings)
-            .createQueryBuilder('PatientSettings')
-            .delete()
-            .from(PatientSettings)
             .where("patient.id = :patientID", { patientID: userLogin.userID })
             .execute()
 

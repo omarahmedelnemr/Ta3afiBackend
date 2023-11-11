@@ -19,8 +19,8 @@ export class Medicine{
     @Column({comment:"This Column is to Identify Weather this Medicine is Being Set on App By The Patient or By a Doctor"})
     auther:string
     
-    @Column()
-    Freq:string
+    @Column({comment:"how Often Should Patient Take This Medicine, like 2 times a Day"})
+    freq:string
 
     @Column({comment:"Weather the Patient is Still Taking or Not"})
     active:boolean
@@ -38,9 +38,5 @@ export class Medicine{
     @ManyToOne(()=>Doctor,doctorID=>doctorID.id)
     @JoinColumn()
     doctor:Doctor
-
-    @ManyToOne(()=>Diagnose,diagnoseID=>diagnoseID.id)
-    @JoinColumn()
-    diagnose:Diagnose    
-
+    
 }

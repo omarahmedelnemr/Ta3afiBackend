@@ -11,7 +11,6 @@ export class DoctorTag{
     @Column()
     tag:string
 
-
     @ManyToOne(()=>Doctor,doctorID=>doctorID.id)
     @JoinColumn()
     doctor:Doctor

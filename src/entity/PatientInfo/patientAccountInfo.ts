@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne, JoinColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne, JoinColumn, OneToOne } from "typeorm"
 import { Patient } from "../users/Patient"
 
 @Entity()
@@ -33,7 +33,7 @@ export class PatientAccountInfo{
     religion:string
 
 
-    @ManyToOne(()=>Patient,patientID=>patientID.id)
+    @OneToOne(()=>Patient,patientID=>patientID.id)
     @JoinColumn()
     patient:Patient
 }
