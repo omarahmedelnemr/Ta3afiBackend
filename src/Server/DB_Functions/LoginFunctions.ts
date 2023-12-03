@@ -2,7 +2,7 @@ import { Database } from "../../data-source";
 import { Doctor } from "../../entity/users/Doctor";
 import { LoginRouter } from "../../entity/login/LoginRouter";
 import { Patient } from "../../entity/users/Patient";
-import { Admin } from "../../entity/users/admin";
+import { Supervisor } from "../../entity/users/Supervisor";
 import responseGenerator from "../../middleFunctions/responseGenerator";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import SendMail from "../../middleFunctions/sendMail";
@@ -64,8 +64,8 @@ class LoginFunctions{
                 userInfo = await Database.getRepository(Patient).findOneBy({id:User['userID']})
             }else if (User['role'].toLowerCase() === 'doctor'){
                 userInfo = await Database.getRepository(Doctor).findOneBy({id:User['userID']})
-            }else if (User['role'].toLowerCase() === "admin"){
-                userInfo = await Database.getRepository(Admin).findOneBy({id:User['userID']})
+            }else if (User['role'].toLowerCase() === "supervisor"){
+                userInfo = await Database.getRepository(Supervisor).findOneBy({id:User['userID']})
             }
 
             
@@ -74,9 +74,15 @@ class LoginFunctions{
                 'email':User['email'],
                 "role":User['role']
             }
+            var genratedJWT;
 
-            //Generat JWT That Last For 10 Days
-            const genratedJWT = jwt.sign( JWTInfo,process.env.JWTsecret,{ expiresIn: 60 * 60 *24*10 } ) 
+            //Generat JWT That Last For 10 Days, But Check Supervision Auth
+            if (User['role'] === 'supervisor'){
+                genratedJWT = jwt.sign( JWTInfo,process.env.JWTSupersecret,{ expiresIn: 60 * 60 *24*10 } ) 
+            }else{
+                genratedJWT = jwt.sign( JWTInfo,process.env.JWTsecret,{ expiresIn: 60 * 60 *24*10 } ) 
+
+            }
 
             // Add The MetaData
             userInfo['email'] = User['email']
