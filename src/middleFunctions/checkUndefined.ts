@@ -9,8 +9,7 @@ function checkUndefined(reqData,params){
         }
     }
     if (missing.length !== 0){
-        console.log(`Missing Parameters are: {${missing}}`)
-        return true
+        return missing
     }
 
     // All Parameters are There
