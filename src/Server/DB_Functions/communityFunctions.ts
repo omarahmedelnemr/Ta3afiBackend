@@ -8,7 +8,7 @@ import { PostReaction } from "../../entity/community/PostReaction";
 import { SavedPost } from "../../entity/community/SavedPost";
 import { Patient } from "../../entity/users/Patient";
 import checkUndefined from "../../middleFunctions/checkUndefined";
-import responseGenerater from "../../middleFunctions/commonResposes";
+import responseGenerater from "../../middleFunctions/responseGenerator";
 
 
 class CommunityFunctions{

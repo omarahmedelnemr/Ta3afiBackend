@@ -11,7 +11,7 @@ import { SavedArticle } from "../../entity/Blog/SavedArticle";
 import { Doctor } from "../../entity/users/Doctor";
 import { Patient } from "../../entity/users/Patient";
 import checkUndefined from "../../middleFunctions/checkUndefined";
-import responseGenerater from "../../middleFunctions/commonResposes";
+import responseGenerater from "../../middleFunctions/responseGenerator";
 
 
 class BlogFunctions{

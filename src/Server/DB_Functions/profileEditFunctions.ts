@@ -2,7 +2,7 @@ import { Database } from "../../data-source";
 import { Doctor } from "../../entity/users/Doctor";
 import { LoginRouter } from "../../entity/login/LoginRouter";
 import checkUndefined from "../../middleFunctions/checkUndefined";
-import commonResposes from "../../middleFunctions/commonResposes";
+import commonResposes from "../../middleFunctions/responseGenerator";
 import { DoctorEducation } from "../../entity/DoctorInfo/DoctorEducation";
 import { DoctorExperince } from "../../entity/DoctorInfo/DoctorExperince";
 import { DoctorCertificate } from "../../entity/DoctorInfo/DoctorCertificate";
