@@ -45,6 +45,7 @@ class CommunityFunctions{
                 .innerJoinAndSelect("Post.patient","patient")
                 .innerJoinAndSelect("Post.community","community")
                 .andWhere("Post.approved = true")
+                .andWhere("Post.deleted = false")
                 .select([
                     "Post.id as id",
                     "Post.date as date",
@@ -70,6 +71,7 @@ class CommunityFunctions{
                 .innerJoinAndSelect("Post.community","community")
                 .where("community.id = :communityID" ,{communityID:reqData['communityID']})
                 .andWhere("Post.approved = true")
+                .andWhere("Post.deleted = false")
                 .select([
                     "Post.id as id",
                     "Post.date as date",
@@ -123,6 +125,7 @@ class CommunityFunctions{
             .innerJoinAndSelect("Post.community","community")
             .where("community.id = :communityID" ,{communityID:reqData['communityID']})
             .andWhere("Post.approved = true")
+            .andWhere("Post.deleted = false")
             .andWhere("Post.mainText like :searchText",{searchText:"%"+reqData['searchText']+"%"})
             .select([
                 "Post.id as id",
@@ -186,6 +189,7 @@ class CommunityFunctions{
                 "Post.mainText as mainText",
                 "Post.hideIdentity as hideIdentity",
                 "Post.approved as approved",
+                "Post.deleted as deleted",
                 "community.name as community",
                 "patient.name as userName",
                 "patient.profileImage as userProfileImage",
@@ -523,8 +527,9 @@ class CommunityFunctions{
 
     // Patient Remove his Comment
     async RemoveComment(reqData){
-        if(checkUndefined(reqData,["patientID",'commentID'])){
-            return  responseGenerater.missingParam
+        const checkParam = checkUndefined(reqData,["patientID",'commentID'])
+        if(checkParam){
+            return  responseGenerater.sendMissingParam(checkParam)
         }
         try{
             // Get Comment Info
@@ -659,6 +664,7 @@ class CommunityFunctions{
                 .innerJoinAndSelect("Post.patient","patient")
                 .innerJoinAndSelect("Post.community","community")
                 .andWhere("Post.approved = true")
+                .andWhere("Post.deleted = false")
                 .select([
                     "Post.id as id",
                     "Post.date as date",

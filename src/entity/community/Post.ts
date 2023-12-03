@@ -30,6 +30,9 @@ export class Post{
     @Column({default:false})
     hideIdentity:boolean
 
+    @Column({default:false,comment:"This Identify weather the Post is Been Deleted By Supervisors"})
+    deleted:boolean
+
     @ManyToOne(()=>Community,communityID=>communityID.id)
     @JoinColumn()
     community:Community
