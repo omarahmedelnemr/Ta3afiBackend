@@ -4,6 +4,7 @@ import AuthRouter from "./Server/Login"
 import profileRouter from './Server/profileEdits'
 import blogRouter from './Server/blog'
 import communityRouter from './Server/community'
+import SupervisorRouter from './Server/supervisor'
 
 
 //Main Modules
@@ -46,7 +47,8 @@ app.use("/blog",blogRouter)
 // Community Posts
 app.use("/community",communityRouter)
 
-
+// Supervisors Functionality
+app.use("/super",SupervisorRouter)
 
 
 // Base endpoint to Test That API is Working
