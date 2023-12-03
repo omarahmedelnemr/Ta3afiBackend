@@ -28,8 +28,9 @@ class profileEditFunctions{
     // Change Email Used in Login
     async confirmChangeEmail(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["oldEmail","newEmail","code"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,["oldEmail","newEmail","code"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get the Code Info and Check if it Even Exist
@@ -89,8 +90,9 @@ class profileEditFunctions{
     // Change Users Password
     async changePassword(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","oldPassword","newPassword"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,["email","oldPassword","newPassword"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get User's Login Information
@@ -125,8 +127,10 @@ class profileEditFunctions{
 
     // Get Doctor Main Info
     async GetDoctorMainInfo(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["doctorID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             const doctorMain = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
@@ -151,8 +155,10 @@ class profileEditFunctions{
 
     // Change Doctor Name
     async changeDoctorName(reqData){
-        if (checkUndefined(reqData,['doctorID','newName'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID','newName'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         // Get Doctor's Info
         const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
@@ -171,8 +177,10 @@ class profileEditFunctions{
 
     // Change Doctor Title
     async changeDoctorTitle(reqData){
-        if (checkUndefined(reqData,['doctorID','newTitle'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID','newTitle'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         // Get Doctor's Info
         const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
@@ -191,8 +199,10 @@ class profileEditFunctions{
     
     // Change Doctor Birth Date
     async changeDoctorBirthDate(reqData){
-        if (checkUndefined(reqData,['doctorID','newBirthDate'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID','newBirthDate'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{       
             // Get Doctor's Info
@@ -215,8 +225,10 @@ class profileEditFunctions{
 
     // Change Doctor Profile Images
     async changeDoctorProfileImage(reqData){
-        if (checkUndefined(reqData,['doctorID','imageName'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID','imageName'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{       
             // Get Doctor's Info
@@ -240,8 +252,9 @@ class profileEditFunctions{
     // Edit Doctor's Description
     async EditDescription(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["doctorID","newDescription"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,['doctorID','newDescription'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{       
             // Get Doctor's Info
@@ -264,8 +277,10 @@ class profileEditFunctions{
 
     // Get Doctor Education Records
     async GetDoctorEducationRecords(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Getting the Record
@@ -281,8 +296,9 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Education)
     async AddDoctorEducation(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["doctorID","title","place","startDate"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,['doctorID',"title","place","startDate"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
 
@@ -310,8 +326,10 @@ class profileEditFunctions{
 
     // Delete Doctor Education
     async DeleteDoctorEducation(reqData){
-        if(checkUndefined(reqData,['doctorID',"recordID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"recordID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check Weather the Record Exist Or not
@@ -339,8 +357,10 @@ class profileEditFunctions{
 
     // Get Doctor Experince Records
     async GetDoctorExperinceRecords(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Getting the Record
@@ -356,8 +376,9 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Experince)
     async AddDoctorExperince(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["emadoctorIDil","title","place","startDate"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,['doctorID',"title","place","startDate"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Doctors DB Entity
@@ -385,8 +406,10 @@ class profileEditFunctions{
 
     // Delete Doctor Experince
     async DeleteDoctorExperince(reqData){
-        if(checkUndefined(reqData,['doctorID',"recordID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"recordID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
 
@@ -415,8 +438,10 @@ class profileEditFunctions{
     
     // Get Doctor Certificate Records
     async GetDoctorCertificateRecords(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Getting the Record
@@ -432,8 +457,9 @@ class profileEditFunctions{
     // Complete the Signup for Doctors (Certificate)
     async AddDoctorCertificate(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["doctorID","title","place","date"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,['doctorID',"title","place","date"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Doctors DB Entity
@@ -460,8 +486,10 @@ class profileEditFunctions{
 
     // Delete Doctor Certificate
     async DeleteDoctorCertificate(reqData){
-        if(checkUndefined(reqData,['doctorID',"recordID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"recordID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
 
@@ -490,8 +518,10 @@ class profileEditFunctions{
 
     // Get Doctor Tags
     async GetDoctorTags(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Getting the Record
@@ -507,9 +537,10 @@ class profileEditFunctions{
     // Add New Doctor Tag
     async AddDoctorTag(reqData){
         
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['doctorID',"tag"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"tag"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             
@@ -548,9 +579,10 @@ class profileEditFunctions{
     // Removing Doctor Tag
     async DeleteDoctorTag(reqData){
 
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['tagID',"doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"tagID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Tag Even Exist
@@ -578,8 +610,10 @@ class profileEditFunctions{
 
     // Get Doctor Prices
     async GetDoctorPriceRanges(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Getting the Record
@@ -595,9 +629,10 @@ class profileEditFunctions{
     // Add New Doctor Pricings
     async AddDoctorPriceRange(reqData){
         
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['doctorID',"price","minutes"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"price","minutes"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             
@@ -632,9 +667,10 @@ class profileEditFunctions{
     // Removing Doctor Pricng
     async DeleteDoctorPriceRange(reqData){
 
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['priceID',"doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['priceID',"doctorID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Price Even Exist
@@ -662,8 +698,10 @@ class profileEditFunctions{
 
     // Get Doctor Available Days
     async GetDoctorAvailableTimes(reqData){
-        if (checkUndefined(reqData,["doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["doctorID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Getting the Record
@@ -683,9 +721,10 @@ class profileEditFunctions{
     // Add New Doctor Available Time Slots
     async AddDoctorAvailableTimes(reqData){
         
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['doctorID',"dayName","hours"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"dayName","hours"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if This Day Slot is Already Exist
@@ -725,9 +764,10 @@ class profileEditFunctions{
     // Removing Doctor Available Time
     async DeleteDoctorAvailableTimes(reqData){
 
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['dayID',"doctorID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['dayID',"doctorID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Time Slot Even Exist
@@ -762,9 +802,11 @@ class profileEditFunctions{
 
     // Edit Existing Day Slot
     async EditDoctorAvailableTimes(reqData){
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['dayID',"doctorID","dayName","hours"])){
-            return responseGenerator.missingParam
+
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['dayID',"doctorID","dayName","hours"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Delete the Day
@@ -795,8 +837,10 @@ class profileEditFunctions{
 
     // Getting Doctor Current Status
     async GetStatus(reqData){
-        if (checkUndefined(reqData,['doctorID'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["doctorID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Th Status From DB
@@ -811,8 +855,10 @@ class profileEditFunctions{
 
     // Set Status as Online or Offline
     async SetStatus(reqData){
-        if (checkUndefined(reqData,['doctorID',"online"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"online"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Doctor Info
@@ -837,8 +883,10 @@ class profileEditFunctions{
 
     // Change Doctor Language
     async ChangeDoctorLang(reqData){
-        if(checkUndefined(reqData,["doctorID","language"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['doctorID',"language"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Doctor Data
@@ -866,8 +914,10 @@ class profileEditFunctions{
 
     // Delete Doctor Account
     async DeleteDoctorAccount(reqData){
-        if(checkUndefined(reqData,['email',"password"])){
-            return responseGenerator.notFound
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['email',"password"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check User's Credintials
@@ -990,8 +1040,10 @@ class profileEditFunctions{
 
     // Get Doctor Main Info
     async GetPatientMainInfo(reqData){
-        if (checkUndefined(reqData,["patientID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Main Info
@@ -1015,8 +1067,10 @@ class profileEditFunctions{
 
     // Change Patient Name
     async changePatientName(reqData){
-        if (checkUndefined(reqData,['patientID','newName'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID','newName'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         // Get Patinet's Info
         const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
@@ -1035,11 +1089,13 @@ class profileEditFunctions{
 
     // Change Patient BirthDate
     async changePatientBirthDate(reqData){
-        if (checkUndefined(reqData,['id','newBirthDate'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID','newBirthDate'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         // Get Patinet's Info
-        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['id']})
+        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
         if (patient === undefined){
             return responseGenerator.notFound
         }
@@ -1055,11 +1111,13 @@ class profileEditFunctions{
 
     // Change Patient Profile Image
     async changePatientProfileImage(reqData){
-        if (checkUndefined(reqData,['id','imageName'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID','imageName'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         // Get Patinet's Info
-        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['id']})
+        const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
         if (patient === undefined){
             return responseGenerator.notFound
         }
@@ -1075,8 +1133,10 @@ class profileEditFunctions{
     
     // Get all Patient Hobbies
     async GetPatientHobbies(reqData){
-        if (checkUndefined(reqData,['patientID'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Hobbies List
@@ -1087,12 +1147,14 @@ class profileEditFunctions{
             return responseGenerator.Error
         }
     }
+
     // Add New Doctor Tag
     async AddPatientHobby(reqData){
     
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['patientID',"hobby"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID','hobby'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             
@@ -1131,9 +1193,10 @@ class profileEditFunctions{
     // Removing Doctor Hobby
     async DeletePatientHobby(reqData){
 
-        // Check if Parameters Exist
-        if(checkUndefined(reqData,['hobbyID',"patientID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID','hobbyID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Hobby Even Exist
@@ -1161,8 +1224,10 @@ class profileEditFunctions{
 
     // Get All Diagnoses List
     async GetPatientDiagnoses(reqData){
-        if (checkUndefined(reqData,["patientID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,['patientID'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             const diagnoses = await Database.getRepository(Diagnose).findBy({patient:{id:reqData['patientID']}})
@@ -1176,8 +1241,10 @@ class profileEditFunctions{
 
     // Patient Add New Patient Diagnose
     async AddPatientDiagnose(reqData){
-        if (checkUndefined(reqData,["patientID","name","doctorName"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","name","doctorName"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Createing New Diagnose
@@ -1200,8 +1267,10 @@ class profileEditFunctions{
 
     //Remove Patient Diagnose
     async DeletePatientDiagnose(reqData){
-        if (checkUndefined(reqData,["patientID","diagnoseID","role"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","diagnoseID","role"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Diagnose Exist and The User is Autherized
@@ -1230,8 +1299,10 @@ class profileEditFunctions{
 
     // Get All Medicine List
     async GetPatientMedicine(reqData){
-        if (checkUndefined(reqData,["patientID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             const medicine = await Database.getRepository(Medicine).findBy({patient:{id:reqData['patientID']}})
@@ -1245,8 +1316,10 @@ class profileEditFunctions{
 
     // Patient Add New Patient Medicine
     async AddPatientMedicine(reqData){
-        if (checkUndefined(reqData,["patientID","name","doctorName","freq","active"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","name","doctorName","freq","active"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Createing New Medicine
@@ -1272,8 +1345,10 @@ class profileEditFunctions{
 
     // Remove Patient Medicine
     async DeletePatientMedicine(reqData){
-        if (checkUndefined(reqData,["patientID","medicineID","role"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","medicineID","role"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Diagnose Exist and The User is Autherized
@@ -1302,8 +1377,10 @@ class profileEditFunctions{
 
     // Get All Prescription List
     async GetPatientPrescriptionFiles(reqData){
-        if (checkUndefined(reqData,["patientID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             const medicine = await Database.getRepository(PrescriptionFile).findBy({patient:{id:reqData['patientID']}})
@@ -1317,8 +1394,10 @@ class profileEditFunctions{
 
     // Patient Add New Patient Prescription
     async AddPatientPrescriptionFile(reqData){
-        if (checkUndefined(reqData,["patientID","fileName","doctorName"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","fileName","doctorName"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Createing New Prescription File
@@ -1340,8 +1419,10 @@ class profileEditFunctions{
 
     // Remove Patient Prescription
     async DeletePatientPrescriptionFile(reqData){
-        if (checkUndefined(reqData,["patientID","prescriptionID","role"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","prescriptionID","role"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if Prescription Exist and The User is Autherized
@@ -1370,8 +1451,10 @@ class profileEditFunctions{
 
     // Change Language
     async ChangePatientLang(reqData){
-        if(checkUndefined(reqData,["patientID","language"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID","language"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Patient Data
@@ -1399,9 +1482,10 @@ class profileEditFunctions{
 
     // Get Patient Account Info, Like Hieght, weight, Blood Type and More
     async GetPatientAccountInfo(reqData){
-        // Check Parameter Existence
-        if(checkUndefined(reqData,['patientID'])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get Patient Account Info
@@ -1419,8 +1503,10 @@ class profileEditFunctions{
 
     // Edit Patient Account Info ( Like Hieght, weight, Blood Type and More )
     async EditPatientAccountInfo(reqData){
-        if(checkUndefined(reqData,["patientID"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["patientID"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get patient Account Info
@@ -1448,8 +1534,10 @@ class profileEditFunctions{
 
     //Delete Patient Account
     async DeletePatientAccount(reqData){
-        if (checkUndefined(reqData,["email","password"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(reqData,["email","password"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check User's Credintials

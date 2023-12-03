@@ -34,9 +34,10 @@ class LoginFunctions{
     //Login Route
     async Login(loginData){
 
-        // Handle Missing Param
-        if (checkUndefined(loginData,["email","password"])){
-            return responseGenerator.missingParam
+        // Check Parameter Existance
+        const checkParam = checkUndefined(loginData,["email","password"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
 
         // Check if the User Exist
@@ -172,8 +173,9 @@ class LoginFunctions{
     async SendConfirmCode(reqData){
 
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,["email"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             
@@ -210,8 +212,9 @@ class LoginFunctions{
     async verifyCode(reqData){
 
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email","code"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,["email","code"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Get the Code Info and Check if it Even Exist
@@ -288,8 +291,9 @@ class LoginFunctions{
     // Reset The Password After Authorization Check
     async forgetPassword(reqData){
         // Check Parameter Existance
-        if (checkUndefined(reqData,["email",'token',"newPassword"])){
-            return responseGenerator.missingParam
+        const checkParam = checkUndefined(reqData,["email",'token',"newPassword"])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if the Secret Code is Authorized
