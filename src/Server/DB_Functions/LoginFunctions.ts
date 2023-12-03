@@ -3,11 +3,10 @@ import { Doctor } from "../../entity/users/Doctor";
 import { LoginRouter } from "../../entity/login/LoginRouter";
 import { Patient } from "../../entity/users/Patient";
 import { Admin } from "../../entity/users/admin";
-import commonResponse from "../../middleFunctions/responseGenerator";
+import responseGenerator from "../../middleFunctions/responseGenerator";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import SendMail from "../../middleFunctions/sendMail";
 import { ConfirmCode } from "../../entity/login/confirmationCode";
-import { PatientAccountInfo } from "../../entity/PatientInfo/patientAccountInfo";
 const bcrypt = require("bcrypt")
 var jwt = require('jsonwebtoken');
 var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
@@ -37,22 +36,22 @@ class LoginFunctions{
 
         // Handle Missing Param
         if (checkUndefined(loginData,["email","password"])){
-            return commonResponse.missingParam
+            return responseGenerator.missingParam
         }
 
         // Check if the User Exist
         const User = await Database.getRepository(LoginRouter).findOneBy({email:loginData['email']})
         if (User === null){
-            return commonResponse.notFound
+            return responseGenerator.notFound
         }
         else if(! await bcrypt.compare(loginData['password'], User['password'])){  // Check Password Correctness
-            return commonResponse.wrongPassword
+            return responseGenerator.wrongPassword
         }
         else if(User.active === false){    // Check if the Account is Deleted
-            return commonResponse.sendError("This Account Was Deleted, Please Create New Account")
+            return responseGenerator.sendError("This Account Was Deleted, Please Create New Account")
         }
         else if (User.confirmed === false){ // Check if the Account is Not confirmed
-            return commonResponse.sendError("Your Account is Not Verified, Please Verify it and Try Again")
+            return responseGenerator.sendError("Your Account is Not Verified, Please Verify it and Try Again")
         }
 
         // Build The JWT and Return User's Info
@@ -83,10 +82,10 @@ class LoginFunctions{
             userInfo['role'] = User['role']
             userInfo['jwt'] = genratedJWT
 
-            return commonResponse.sendData(userInfo)
+            return responseGenerator.sendData(userInfo)
         }catch(err){
             console.log(err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
 
     }
@@ -96,13 +95,13 @@ class LoginFunctions{
         // Check Parameter Existance
         const checkParam = checkUndefined(reqData,['email','password',"name","birthDate","gender","title","description"])
         if (checkParam){
-            return commonResponse.sendMissingParam(checkParam)
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if the Email Already in User
             const checkExist = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email'],active:true})
             if (checkExist !== null ){
-                return commonResponse.alreadyExist
+                return responseGenerator.alreadyExist
             }
             
             // Create New Doctor Entity
@@ -124,10 +123,10 @@ class LoginFunctions{
             newLoginRouter.userID   = newDoctor.id
             await Database.getRepository(LoginRouter).save(newLoginRouter)
 
-            return commonResponse.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
     }
 
@@ -136,13 +135,13 @@ class LoginFunctions{
         // Check Parameter Existance
         const checkParam = checkUndefined(reqData,['email','password',"name","birthDate","gender"])
         if (checkParam){
-            return commonResponse.sendMissingParam(checkParam)
+            return responseGenerator.sendMissingParam(checkParam)
         }
         try{
             // Check if the Email Already in User
             const checkExist = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email'],active:true})
             if (checkExist !== null ){
-                return commonResponse.alreadyExist
+                return responseGenerator.alreadyExist
             }
             
             // Create New Patient Entity
@@ -162,10 +161,10 @@ class LoginFunctions{
             newLoginRouter.userID   = newPatient.id
             await Database.getRepository(LoginRouter).save(newLoginRouter)
 
-            return commonResponse.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
     }
 
@@ -174,7 +173,7 @@ class LoginFunctions{
 
         // Check Parameter Existance
         if (checkUndefined(reqData,["email"])){
-            return commonResponse.missingParam
+            return responseGenerator.missingParam
         }
         try{
             
@@ -200,10 +199,10 @@ class LoginFunctions{
 
             // Send Email With the Code
             SendMail(reqData['email'],"Confirm Your Email",`Welcome To Ta3afi,\nhere is your Code to Confirm Your Email: ${fourDigitsVerficationConde}`)
-            return commonResponse.sendData("Confirmation Code Sent")
+            return responseGenerator.sendData("Confirmation Code Sent")
         }catch(err){
             console.log("Error!\n",err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
     }
     
@@ -212,24 +211,24 @@ class LoginFunctions{
 
         // Check Parameter Existance
         if (checkUndefined(reqData,["email","code"])){
-            return commonResponse.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get the Code Info and Check if it Even Exist
             const code = await Database.getRepository(ConfirmCode).findOneBy({email:reqData['email']})
             if (code === null){
-                return commonResponse.notFound
+                return responseGenerator.notFound
             }
 
             // Check Code Expiration Date
             const currentDate = new Date()
             if (currentDate > code.expiresIn){
-                return commonResponse.sendError("Code Expired")
+                return responseGenerator.sendError("Code Expired")
             }
 
             // Check if the Entered Code is Not Correct
             else if (code.code !== reqData['code']){
-                return commonResponse.sendError("Wrong Code")
+                return responseGenerator.sendError("Wrong Code")
             }
             
             // The Code is Correct
@@ -246,12 +245,12 @@ class LoginFunctions{
                 .where("email = :email", { email: reqData['email'] })
                 .execute()
 
-                return commonResponse.sendData({"token":token})
+                return responseGenerator.sendData({"token":token})
 
             }
         }catch(err){
             console.log("Error!\n",err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
     }
 
@@ -259,7 +258,7 @@ class LoginFunctions{
     async confirmAccount(reqData){
         const checkParam = checkUndefined(reqData,['email','token'])
         if (checkParam){
-            return commonResponse.sendMissingParam(checkParam)
+            return responseGenerator.sendMissingParam(checkParam)
         }
 
         try{
@@ -270,7 +269,7 @@ class LoginFunctions{
                     throw new Error("Invalid JWT")
                 }
             }catch{
-                return commonResponse.custom(405,"unAuthenticated")
+                return responseGenerator.custom(405,"unAuthenticated")
             }
 
             // Update the Confirmed Status on Login Router
@@ -279,10 +278,10 @@ class LoginFunctions{
             await Database.getRepository(LoginRouter).save(loginRoute)
             
             // Return to the FrontEnd
-            return commonResponse.sendData("Account Verified")
+            return responseGenerator.sendData("Account Verified")
         }catch(err){
             console.log("Error!\n",err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
     }
     
@@ -290,7 +289,7 @@ class LoginFunctions{
     async forgetPassword(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["email",'token',"newPassword"])){
-            return commonResponse.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if the Secret Code is Authorized
@@ -300,23 +299,23 @@ class LoginFunctions{
                     throw new Error("Invalid JWT")
                 }
             }catch(err){
-                return commonResponse.custom(405,"Not Authorized")
+                return responseGenerator.custom(405,"Not Authorized")
             }
 
             // The Token is Ok, so Get The Login Info
             const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
             if (loginInfo === null){
-                return commonResponse.notFound
+                return responseGenerator.notFound
             }
 
             // Change the Password
             loginInfo.password = await bcrypt.hash(reqData['newPassword'],10)
             await Database.getRepository(LoginRouter).save(loginInfo)
 
-            return commonResponse.sendData("Password Reseted Successfully")
+            return responseGenerator.sendData("Password Reseted Successfully")
         }catch(err){
             console.log("Error!\n",err)
-            return commonResponse.Error
+            return responseGenerator.Error
         }
     }
 }

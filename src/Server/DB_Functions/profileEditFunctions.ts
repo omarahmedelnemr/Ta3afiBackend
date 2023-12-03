@@ -2,7 +2,7 @@ import { Database } from "../../data-source";
 import { Doctor } from "../../entity/users/Doctor";
 import { LoginRouter } from "../../entity/login/LoginRouter";
 import checkUndefined from "../../middleFunctions/checkUndefined";
-import commonResposes from "../../middleFunctions/responseGenerator";
+import responseGenerator from "../../middleFunctions/responseGenerator";
 import { DoctorEducation } from "../../entity/DoctorInfo/DoctorEducation";
 import { DoctorExperince } from "../../entity/DoctorInfo/DoctorExperince";
 import { DoctorCertificate } from "../../entity/DoctorInfo/DoctorCertificate";
@@ -29,31 +29,31 @@ class profileEditFunctions{
     async confirmChangeEmail(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["oldEmail","newEmail","code"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get the Code Info and Check if it Even Exist
             const code = await Database.getRepository(ConfirmCode).findOneBy({email:reqData['newEmail']})
             if (code === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Check Code Expiration Date
             const currentDate = new Date()
             if (currentDate > code.expiresIn){
-                return commonResposes.sendError("Code Expired")
+                return responseGenerator.sendError("Code Expired")
             }
 
             // Check if the Entered Code is Not Correct
             else if (code.code !== reqData['code']){
-                return commonResposes.sendError("Wrong Code")
+                return responseGenerator.sendError("Wrong Code")
             }
             
             // The Code is Correct
             else{
                 const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData["oldEmail"]})
                 if (loginInfo === null){
-                    return commonResposes.notFound
+                    return responseGenerator.notFound
                 }   
                 loginInfo.email = reqData['newEmail']
 
@@ -78,11 +78,11 @@ class profileEditFunctions{
                 .where("email = :email", { email: reqData['newEmail'] })
                 .execute()
 
-                return commonResposes.done
+                return responseGenerator.done
             }
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -90,18 +90,18 @@ class profileEditFunctions{
     async changePassword(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["email","oldPassword","newPassword"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get User's Login Information
             const loginInfo = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
             if (loginInfo === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Check if old Password is Correct
             if (! await bcrypt.compare(reqData['oldPassword'],loginInfo.password)){
-                return commonResposes.wrongPassword
+                return responseGenerator.wrongPassword
             }
 
             // Change the Password
@@ -110,11 +110,11 @@ class profileEditFunctions{
 
             // Send Notification Mail
             SendMail(reqData['email'],"Password Changed","Hello,\nWe Would Like to Tell You That You Changed Your Password Successfully,\nif You are not the One who Change It, please Contact us Immediately")
-            return commonResposes.sendData("Password Changed Successfully")
+            return responseGenerator.sendData("Password Changed Successfully")
             
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -126,25 +126,25 @@ class profileEditFunctions{
     // Get Doctor Main Info
     async GetDoctorMainInfo(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             const doctorMain = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (doctorMain === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             const getEmail = await Database.getRepository(LoginRouter).findOneBy({userID:reqData['doctorID'],role:"doctor"})
             if (getEmail === null){
-                return commonResposes.custom(403,"The Account Data is Missing, Please Contact Support")
+                return responseGenerator.custom(403,"The Account Data is Missing, Please Contact Support")
             }
             doctorMain['email'] = getEmail.email
 
-            return commonResposes.sendData(doctorMain)
+            return responseGenerator.sendData(doctorMain)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
 
     }
@@ -152,12 +152,12 @@ class profileEditFunctions{
     // Change Doctor Name
     async changeDoctorName(reqData){
         if (checkUndefined(reqData,['doctorID','newName'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         // Get Doctor's Info
         const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
         if (doctor === undefined){
-            return commonResposes.notFound
+            return responseGenerator.notFound
         }
 
         // Change Doctor's Name
@@ -166,18 +166,18 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Doctor).save(doctor)
 
-        return commonResposes.done
+        return responseGenerator.done
     }
 
     // Change Doctor Title
     async changeDoctorTitle(reqData){
         if (checkUndefined(reqData,['doctorID','newTitle'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         // Get Doctor's Info
         const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
         if (doctor === undefined){
-            return commonResposes.notFound
+            return responseGenerator.notFound
         }
 
         // Change Doctor's Name
@@ -186,19 +186,19 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Doctor).save(doctor)
 
-        return commonResposes.done
+        return responseGenerator.done
     }
     
     // Change Doctor Birth Date
     async changeDoctorBirthDate(reqData){
         if (checkUndefined(reqData,['doctorID','newBirthDate'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{       
             // Get Doctor's Info
             const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (doctor === undefined){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Change Doctor's Name
@@ -206,23 +206,23 @@ class profileEditFunctions{
 
             // Save Changes To DB
             await Database.getRepository(Doctor).save(doctor)
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Change Doctor Profile Images
     async changeDoctorProfileImage(reqData){
         if (checkUndefined(reqData,['doctorID','imageName'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{       
             // Get Doctor's Info
             const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (doctor === undefined){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Change Doctor's Image
@@ -230,10 +230,10 @@ class profileEditFunctions{
 
             // Save Changes To DB
             await Database.getRepository(Doctor).save(doctor)
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -241,13 +241,13 @@ class profileEditFunctions{
     async EditDescription(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["doctorID","newDescription"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{       
             // Get Doctor's Info
             const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (doctor === undefined){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Change Doctor's Name
@@ -255,26 +255,26 @@ class profileEditFunctions{
 
             // Save Changes To DB
             await Database.getRepository(Doctor).save(doctor)
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get Doctor Education Records
     async GetDoctorEducationRecords(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Getting the Record
             const educationRecords = await Database.getRepository(DoctorEducation).findBy({doctor:{id:reqData['doctorID']}})
-            return commonResposes.sendData(educationRecords)
+            return responseGenerator.sendData(educationRecords)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -282,14 +282,14 @@ class profileEditFunctions{
     async AddDoctorEducation(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["doctorID","title","place","startDate"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
 
             // Get Doctors DB Entity
             const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (currentDoctor === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }         
             // Adding Doctors Educations
             var newEducation     = new DoctorEducation()
@@ -300,24 +300,24 @@ class profileEditFunctions{
             newEducation.endDate   = new Date(reqData['endDate'])
             await Database.getRepository(DoctorEducation).save(newEducation)
             
-            return commonResposes.done
+            return responseGenerator.done
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Delete Doctor Education
     async DeleteDoctorEducation(reqData){
         if(checkUndefined(reqData,['doctorID',"recordID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check Weather the Record Exist Or not
             const EduRecord = await Database.getRepository(DoctorEducation).findOneBy({id:reqData["recordID"],doctor:{id:reqData['doctorID']}})
             if(EduRecord === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Remove Confirmation Code from DB
@@ -330,26 +330,26 @@ class profileEditFunctions{
             .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get Doctor Experince Records
     async GetDoctorExperinceRecords(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Getting the Record
             const ExperinceRecords = await Database.getRepository(DoctorExperince).findBy({doctor:{id:reqData['doctorID']}})
-            return commonResposes.sendData(ExperinceRecords)
+            return responseGenerator.sendData(ExperinceRecords)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -357,13 +357,13 @@ class profileEditFunctions{
     async AddDoctorExperince(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["emadoctorIDil","title","place","startDate"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Doctors DB Entity
             const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (currentDoctor === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Adding Doctors Experince
@@ -375,25 +375,25 @@ class profileEditFunctions{
             newExperince.endDate   = new Date(reqData['endDate'])
             await Database.getRepository(DoctorExperince).save(newExperince)
             
-            return commonResposes.done
+            return responseGenerator.done
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Delete Doctor Experince
     async DeleteDoctorExperince(reqData){
         if(checkUndefined(reqData,['doctorID',"recordID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
 
             // Check Weather the Record Exist Or not
             const ExpRecord = await Database.getRepository(DoctorExperince).findOneBy({id:reqData["recordID"],doctor:{id:reqData['doctorID']}})
             if(ExpRecord === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Remove Confirmation Code from DB
@@ -406,26 +406,26 @@ class profileEditFunctions{
             .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
     
     // Get Doctor Certificate Records
     async GetDoctorCertificateRecords(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Getting the Record
             const CertificateRecords = await Database.getRepository(DoctorCertificate).findBy({doctor:{id:reqData['doctorID']}})
-            return commonResposes.sendData(CertificateRecords)
+            return responseGenerator.sendData(CertificateRecords)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
     
@@ -433,13 +433,13 @@ class profileEditFunctions{
     async AddDoctorCertificate(reqData){
         // Check Parameter Existance
         if (checkUndefined(reqData,["doctorID","title","place","date"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Doctors DB Entity
             const currentDoctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             if (currentDoctor === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Adding Doctor Certificate
@@ -450,25 +450,25 @@ class profileEditFunctions{
             newCertificate.date = new Date(reqData['date'])
             await Database.getRepository(DoctorCertificate).save(newCertificate)
             
-            return commonResposes.done
+            return responseGenerator.done
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Delete Doctor Certificate
     async DeleteDoctorCertificate(reqData){
         if(checkUndefined(reqData,['doctorID',"recordID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
 
             // Check Weather the Record Exist Or not
             const CertRecord = await Database.getRepository(DoctorCertificate).findOneBy({id:reqData["recordID"],doctor:{id:reqData['doctorID']}})
             if(CertRecord === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Remove Confirmation Code from DB
@@ -481,26 +481,26 @@ class profileEditFunctions{
             .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get Doctor Tags
     async GetDoctorTags(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Getting the Record
             const Tags = await Database.getRepository(DoctorTag).findBy({doctor:{id:reqData['doctorID']}})
-            return commonResposes.sendData(Tags)
+            return responseGenerator.sendData(Tags)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -509,25 +509,25 @@ class profileEditFunctions{
         
         // Check if Parameters Exist
         if(checkUndefined(reqData,['doctorID',"tag"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             
             // Perform Some Aditional Checks
             if (reqData['tag'] === ''){
-                return commonResposes.sendError("Tag Cannot Be Empty")
+                return responseGenerator.sendError("Tag Cannot Be Empty")
             }
             
             // if the Doctor Exceed The Tag Number Limit
             const count =  await Database.getRepository(DoctorTag).countBy({doctor:{id:reqData['doctorID']}})
             if (count >= 3 ){
-                return commonResposes.sendError('Doctor Exceeds The Maximum Number of Tags (3)')
+                return responseGenerator.sendError('Doctor Exceeds The Maximum Number of Tags (3)')
             }
 
             // Check if Tag is Not Already Exist
             const checkTag = await Database.getRepository(DoctorTag).findOneBy({doctor:{id:reqData['doctorID']},tag:reqData['tag']})
             if (checkTag !== null){
-                return commonResposes.sendError("This Tag Already Exist")
+                return responseGenerator.sendError("This Tag Already Exist")
             }
 
             // Create New Tag
@@ -538,10 +538,10 @@ class profileEditFunctions{
             // Save it to The DB
             await Database.getRepository(DoctorTag).save(newTag)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -550,13 +550,13 @@ class profileEditFunctions{
 
         // Check if Parameters Exist
         if(checkUndefined(reqData,['tagID',"doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Tag Even Exist
             const checkTag = await Database.getRepository(DoctorTag).findOneBy({doctor:{id:reqData['doctorID']},id:reqData['tagID']})
             if (checkTag === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Remove The Tag From DB
@@ -569,26 +569,26 @@ class profileEditFunctions{
             .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get Doctor Prices
     async GetDoctorPriceRanges(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Getting the Record
             const Prices = await Database.getRepository(Pricing).findBy({doctor:{id:reqData['doctorID']}})
-            return commonResposes.sendData(Prices)
+            return responseGenerator.sendData(Prices)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -597,20 +597,20 @@ class profileEditFunctions{
         
         // Check if Parameters Exist
         if(checkUndefined(reqData,['doctorID',"price","minutes"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             
             // if the Doctor Exceed The Price Range Limit
             const count =  await Database.getRepository(Pricing).countBy({doctor:{id:reqData['doctorID']}})
             if (count >= 3 ){
-                return commonResposes.sendError('You Have Exceeds The Maximum Number of Price Ranges (3)')
+                return responseGenerator.sendError('You Have Exceeds The Maximum Number of Price Ranges (3)')
             }
 
             // Check if Pricing for this amount of minuts is Not Already Exist
             const checkPrice = await Database.getRepository(Pricing).findOneBy({doctor:{id:reqData['doctorID']},minutesRate:reqData['minutes']})
             if (checkPrice !== null){
-                return commonResposes.sendError("You Cannot Set Two Prices for the Same Minutes")
+                return responseGenerator.sendError("You Cannot Set Two Prices for the Same Minutes")
             }
 
             // Create New Price Range
@@ -622,10 +622,10 @@ class profileEditFunctions{
             // Save it to The DB
             await Database.getRepository(Pricing).save(newPricing)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -634,13 +634,13 @@ class profileEditFunctions{
 
         // Check if Parameters Exist
         if(checkUndefined(reqData,['priceID',"doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Price Even Exist
             const checkPrice = await Database.getRepository(Pricing).findOneBy({doctor:{id:reqData['doctorID']},id:reqData['priceID']})
             if (checkPrice === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Remove The Price From DB
@@ -653,17 +653,17 @@ class profileEditFunctions{
             .andWhere("doctor.id = doctorID",{ doctorID: reqData['doctorID']})
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get Doctor Available Days
     async GetDoctorAvailableTimes(reqData){
         if (checkUndefined(reqData,["doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Getting the Record
@@ -672,11 +672,11 @@ class profileEditFunctions{
             for (var i=0;i<days.length;i++){
                 days[i]['hours'] = await Database.getRepository(AvailableHour).findBy({day:{id:days[i]['id']}})
             }
-            return commonResposes.sendData(days)
+            return responseGenerator.sendData(days)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
     
@@ -685,7 +685,7 @@ class profileEditFunctions{
         
         // Check if Parameters Exist
         if(checkUndefined(reqData,['doctorID',"dayName","hours"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if This Day Slot is Already Exist
@@ -695,7 +695,7 @@ class profileEditFunctions{
                 dayName:reqData['dayName'],
             })
             if (checkPrice !== null){
-                return commonResposes.sendError("This Day Slot is Already Exist")
+                return responseGenerator.sendError("This Day Slot is Already Exist")
             }
 
             // Create New Time
@@ -715,10 +715,10 @@ class profileEditFunctions{
                 await Database.getRepository(AvailableHour).save(newHour)
             }
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -727,13 +727,13 @@ class profileEditFunctions{
 
         // Check if Parameters Exist
         if(checkUndefined(reqData,['dayID',"doctorID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Time Slot Even Exist
             const day = await Database.getRepository(AvailableDays).findOneBy({doctor:{id:reqData['doctorID']},id:reqData['dayID']})
             if (day === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
             // Remove All Hours Related to This Day
             await Database
@@ -753,10 +753,10 @@ class profileEditFunctions{
             .where("id = :dayID", { dayID: day.id })
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -764,7 +764,7 @@ class profileEditFunctions{
     async EditDoctorAvailableTimes(reqData){
         // Check if Parameters Exist
         if(checkUndefined(reqData,['dayID',"doctorID","dayName","hours"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Delete the Day
@@ -772,7 +772,7 @@ class profileEditFunctions{
                 "dayID":reqData['dayID'],
                 "doctorID":reqData['doctorID']
             })
-            if (deleted.data !== commonResposes.done.data){
+            if (deleted.data !== responseGenerator.done.data){
                 return deleted
             }
 
@@ -782,37 +782,37 @@ class profileEditFunctions{
                 "dayName":reqData['dayName'],
                 "hours":reqData['hours']
             })
-            if (newOne.data !== commonResposes.done.data){
+            if (newOne.data !== responseGenerator.done.data){
                 return newOne
             }
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
 
-        return commonResposes.done
+        return responseGenerator.done
     }
 
     // Getting Doctor Current Status
     async GetStatus(reqData){
         if (checkUndefined(reqData,['doctorID'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Th Status From DB
             const status  = await  Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
-            return commonResposes.sendData({'online':status.online})
+            return responseGenerator.sendData({'online':status.online})
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Set Status as Online or Offline
     async SetStatus(reqData){
         if (checkUndefined(reqData,['doctorID',"online"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Doctor Info
@@ -820,7 +820,7 @@ class profileEditFunctions{
 
             //Check if Not Exist
             if (doc === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
             //change the Status
             doc.online = reqData['online']
@@ -828,17 +828,17 @@ class profileEditFunctions{
             // Save Changes
             await Database.getRepository(Doctor).save(doc)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Change Doctor Language
     async ChangeDoctorLang(reqData){
         if(checkUndefined(reqData,["doctorID","language"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Doctor Data
@@ -846,44 +846,44 @@ class profileEditFunctions{
             
             // Check Doctor Existance
             if (doc === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
             // Check if it is the Same Lang
             else if(doc.language === reqData['language']){
-                return commonResposes.sendError(`The User's Language is Already ${reqData['language']}`)
+                return responseGenerator.sendError(`The User's Language is Already ${reqData['language']}`)
             }
 
             // Modify the Entity
             doc.language = reqData['language']
             await Database.getRepository(Doctor).save(doc)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Delete Doctor Account
     async DeleteDoctorAccount(reqData){
         if(checkUndefined(reqData,['email',"password"])){
-            return commonResposes.notFound
+            return responseGenerator.notFound
         }
         try{
             // Check User's Credintials
             const userLogin = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
             if (userLogin === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // check the Password Correctness
             else if (! await bcrypt.compare(reqData['password'], userLogin['password'])){
-                return commonResposes.wrongPassword
+                return responseGenerator.wrongPassword
             }
 
             // Check if the Role is Correct
             else if (reqData['role'].toLowerCase() !== userLogin.role){
-                return commonResposes.sendError("You Are Not Authenticated")
+                return responseGenerator.sendError("You Are Not Authenticated")
             }
             ///// Deleteing Doctor Information
 
@@ -974,11 +974,11 @@ class profileEditFunctions{
             \nTa3afi Team\
 ")
 
-            return commonResposes.sendData("The Account is Deleted Successfully")
+            return responseGenerator.sendData("The Account is Deleted Successfully")
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
 
     }
@@ -991,24 +991,24 @@ class profileEditFunctions{
     // Get Doctor Main Info
     async GetPatientMainInfo(reqData){
         if (checkUndefined(reqData,["patientID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Main Info
             const patientMain = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             if (patientMain === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             const getEmail = await Database.getRepository(LoginRouter).findOneBy({userID:reqData['patientID'],role:"patient"})
 
             patientMain['email'] = getEmail.email
 
-            return commonResposes.sendData(patientMain)
+            return responseGenerator.sendData(patientMain)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
 
     }
@@ -1016,12 +1016,12 @@ class profileEditFunctions{
     // Change Patient Name
     async changePatientName(reqData){
         if (checkUndefined(reqData,['patientID','newName'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         // Get Patinet's Info
         const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
         if (patient === undefined){
-            return commonResposes.notFound
+            return responseGenerator.notFound
         }
 
         // Change Patient's Name
@@ -1030,18 +1030,18 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Patient).save(patient)
 
-        return commonResposes.done
+        return responseGenerator.done
     }
 
     // Change Patient BirthDate
     async changePatientBirthDate(reqData){
         if (checkUndefined(reqData,['id','newBirthDate'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         // Get Patinet's Info
         const patient = await Database.getRepository(Patient).findOneBy({id:reqData['id']})
         if (patient === undefined){
-            return commonResposes.notFound
+            return responseGenerator.notFound
         }
 
         // Change Patient's Name
@@ -1050,18 +1050,18 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Patient).save(patient)
 
-        return commonResposes.done
+        return responseGenerator.done
     }
 
     // Change Patient Profile Image
     async changePatientProfileImage(reqData){
         if (checkUndefined(reqData,['id','imageName'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         // Get Patinet's Info
         const patient = await Database.getRepository(Patient).findOneBy({id:reqData['id']})
         if (patient === undefined){
-            return commonResposes.notFound
+            return responseGenerator.notFound
         }
 
         // Change Patient's image
@@ -1070,21 +1070,21 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Patient).save(patient)
 
-        return commonResposes.done
+        return responseGenerator.done
     }
     
     // Get all Patient Hobbies
     async GetPatientHobbies(reqData){
         if (checkUndefined(reqData,['patientID'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Hobbies List
             const hobbies = await Database.getRepository(Hobby).findBy({patient:{id:reqData['patientID']}})
-            return commonResposes.sendData(hobbies)
+            return responseGenerator.sendData(hobbies)
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
     // Add New Doctor Tag
@@ -1092,25 +1092,25 @@ class profileEditFunctions{
     
         // Check if Parameters Exist
         if(checkUndefined(reqData,['patientID',"hobby"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             
             // Perform Some Aditional Checks
             if (reqData['hobby'] === ''){
-                return commonResposes.sendError("Hobby Cannot Be Empty")
+                return responseGenerator.sendError("Hobby Cannot Be Empty")
             }
             
             // if the User Exceed The Hobby Number Limit
             const count =  await Database.getRepository(Hobby).countBy({patient:{id:reqData['patientID']}})
             if (count >= 5 ){
-                return commonResposes.sendError('You Exceeds The Maximum Number of Hobbies (5)')
+                return responseGenerator.sendError('You Exceeds The Maximum Number of Hobbies (5)')
             }
 
             // Check if Hobby is Not Already Exist
             const checkHobby = await Database.getRepository(Hobby).findOneBy({patient:{id:reqData['patientID']},hobby:reqData['hobby']})
             if (checkHobby !== null){
-                return commonResposes.sendError("This Hobby Already Exist")
+                return responseGenerator.sendError("This Hobby Already Exist")
             }
 
             // Create New Hobby
@@ -1121,10 +1121,10 @@ class profileEditFunctions{
             // Save it to The DB
             await Database.getRepository(Hobby).save(newHobby)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -1133,13 +1133,13 @@ class profileEditFunctions{
 
         // Check if Parameters Exist
         if(checkUndefined(reqData,['hobbyID',"patientID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Hobby Even Exist
             const checkHobby = await Database.getRepository(Hobby).findOneBy({patient:{id:reqData['patientID']},id:reqData['hobbyID']})
             if (checkHobby === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // Remove The Hobby From DB
@@ -1152,32 +1152,32 @@ class profileEditFunctions{
             .andWhere("patient.id = patientID",{ patientID: reqData['patientID']})
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get All Diagnoses List
     async GetPatientDiagnoses(reqData){
         if (checkUndefined(reqData,["patientID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             const diagnoses = await Database.getRepository(Diagnose).findBy({patient:{id:reqData['patientID']}})
-            return commonResposes.sendData(diagnoses)
+            return responseGenerator.sendData(diagnoses)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Patient Add New Patient Diagnose
     async AddPatientDiagnose(reqData){
         if (checkUndefined(reqData,["patientID","name","doctorName"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Createing New Diagnose
@@ -1191,25 +1191,25 @@ class profileEditFunctions{
             // Save to DB
             await Database.getRepository(Diagnose).save(newDiagnose)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     //Remove Patient Diagnose
     async DeletePatientDiagnose(reqData){
         if (checkUndefined(reqData,["patientID","diagnoseID","role"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Diagnose Exist and The User is Autherized
             const diagnose = await Database.getRepository(Diagnose).findOneBy({id:reqData['diagnoseID'],patient:{id:reqData['patientID']}})
             if (diagnose === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }else if(diagnose.auther.toLowerCase() !== reqData['role'].toLowerCase()){
-                return commonResposes.sendError("You Are Not Autherized")
+                return responseGenerator.sendError("You Are Not Autherized")
             }
 
             // Remove The Diagnose From DB
@@ -1221,32 +1221,32 @@ class profileEditFunctions{
             .where("id = :diagnoseID", { diagnoseID: reqData['diagnoseID'] })
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get All Medicine List
     async GetPatientMedicine(reqData){
         if (checkUndefined(reqData,["patientID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             const medicine = await Database.getRepository(Medicine).findBy({patient:{id:reqData['patientID']}})
-            return commonResposes.sendData(medicine)
+            return responseGenerator.sendData(medicine)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Patient Add New Patient Medicine
     async AddPatientMedicine(reqData){
         if (checkUndefined(reqData,["patientID","name","doctorName","freq","active"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Createing New Medicine
@@ -1263,25 +1263,25 @@ class profileEditFunctions{
             // Save to DB
             await Database.getRepository(Diagnose).save(newMedicine)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Remove Patient Medicine
     async DeletePatientMedicine(reqData){
         if (checkUndefined(reqData,["patientID","medicineID","role"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Diagnose Exist and The User is Autherized
             const medicine = await Database.getRepository(Medicine).findOneBy({id:reqData['medicineID'],patient:reqData['patientID']})
             if (medicine === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }else if(medicine.auther.toLowerCase() !== reqData['role'].toLowerCase()){
-                return commonResposes.sendError("You Are Not Autherized")
+                return responseGenerator.sendError("You Are Not Autherized")
             }
 
             // Remove The Diagnose From DB
@@ -1293,32 +1293,32 @@ class profileEditFunctions{
             .where("id = :medicineID", { medicineID: reqData['medicineID'] })
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Get All Prescription List
     async GetPatientPrescriptionFiles(reqData){
         if (checkUndefined(reqData,["patientID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             const medicine = await Database.getRepository(PrescriptionFile).findBy({patient:{id:reqData['patientID']}})
-            return commonResposes.sendData(medicine)
+            return responseGenerator.sendData(medicine)
 
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Patient Add New Patient Prescription
     async AddPatientPrescriptionFile(reqData){
         if (checkUndefined(reqData,["patientID","fileName","doctorName"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Createing New Prescription File
@@ -1331,25 +1331,25 @@ class profileEditFunctions{
             // Save to DB
             await Database.getRepository(PrescriptionFile).save(newPrescription)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Remove Patient Prescription
     async DeletePatientPrescriptionFile(reqData){
         if (checkUndefined(reqData,["patientID","prescriptionID","role"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check if Prescription Exist and The User is Autherized
             const prescription = await Database.getRepository(PrescriptionFile).findOneBy({id:reqData['prescriptionID'],patient:{id:reqData["patientID"]}})
             if (prescription === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }else if(prescription.auther.toLowerCase() !== reqData['role'].toLowerCase()){
-                return commonResposes.sendError("You Are Not Autherized")
+                return responseGenerator.sendError("You Are Not Autherized")
             }
 
             // Remove The Prescription From DB
@@ -1361,17 +1361,17 @@ class profileEditFunctions{
             .where("id = :prescriptionID", { prescriptionID: reqData['prescriptionID'] })
             .execute()
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Change Language
     async ChangePatientLang(reqData){
         if(checkUndefined(reqData,["patientID","language"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Patient Data
@@ -1379,21 +1379,21 @@ class profileEditFunctions{
             
             // Check Patient Existance
             if (patient === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
             // Check if it is the Same Lang
             else if(patient.language === reqData['language']){
-                return commonResposes.sendError(`The User's Language is Already ${reqData['language']}`)
+                return responseGenerator.sendError(`The User's Language is Already ${reqData['language']}`)
             }
 
             // Modify the Entity
             patient.language = reqData['language']
             await Database.getRepository(Patient).save(patient)
 
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
@@ -1401,26 +1401,26 @@ class profileEditFunctions{
     async GetPatientAccountInfo(reqData){
         // Check Parameter Existence
         if(checkUndefined(reqData,['patientID'])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get Patient Account Info
             const info = await Database.getRepository(PatientAccountInfo).findOneBy({patient:{id:reqData['patientID']}})
             if (info === null){
-                return commonResposes.sendError("There is an Error in Account Creation, Please re-Create The Account or Contact The Backend")
+                return responseGenerator.sendError("There is an Error in Account Creation, Please re-Create The Account or Contact The Backend")
             }
 
-            return commonResposes.sendData(info)
+            return responseGenerator.sendData(info)
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     // Edit Patient Account Info ( Like Hieght, weight, Blood Type and More )
     async EditPatientAccountInfo(reqData){
         if(checkUndefined(reqData,["patientID"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Get patient Account Info
@@ -1439,33 +1439,33 @@ class profileEditFunctions{
             // Save Changes to DB
             await Database.getRepository(PatientAccountInfo).save(info)
             
-            return commonResposes.done
+            return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
 
     //Delete Patient Account
     async DeletePatientAccount(reqData){
         if (checkUndefined(reqData,["email","password"])){
-            return commonResposes.missingParam
+            return responseGenerator.missingParam
         }
         try{
             // Check User's Credintials
             const userLogin = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
             if (userLogin === null){
-                return commonResposes.notFound
+                return responseGenerator.notFound
             }
 
             // check the Password Correctness
             else if (! await bcrypt.compare(reqData['password'], userLogin['password'])){
-                return commonResposes.wrongPassword
+                return responseGenerator.wrongPassword
             }
 
             // Check if the Role is Correct
             else if (reqData['role'].toLowerCase() !== userLogin.role){
-                return commonResposes.sendError("You Are Not Authenticated")
+                return responseGenerator.sendError("You Are Not Authenticated")
             }
 
             ///// Deleteing Patient Information
@@ -1520,10 +1520,10 @@ class profileEditFunctions{
             \nTa3afi Team\
 ")
 
-            return commonResposes.sendData("The Account is Deleted Successfully")
+            return responseGenerator.sendData("The Account is Deleted Successfully")
         }catch(err){
             console.log("Error!\n",err)
-            return commonResposes.Error
+            return responseGenerator.Error
         }
     }
     
