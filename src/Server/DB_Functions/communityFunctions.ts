@@ -759,16 +759,4 @@ class CommunityFunctions{
 }
 
 
-// if(checkUndefined(reqData,[''])){
-//     return  responseGenerater.missingParam
-// }
-// try{
-
-// }catch(err){
-//     console.log("Error!\n",err)
-//     return responseGenerater.Error
-// }
-
-
-
 export default new CommunityFunctions();
