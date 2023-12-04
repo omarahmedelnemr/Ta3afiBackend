@@ -6,6 +6,7 @@ import blogRouter from './Server/blog'
 import communityRouter from './Server/community'
 import SupervisorRouter from './Server/supervisor'
 import NotificationRouter from './Server/Notifications'
+import AdminRouter from './Server/admin'
 
 
 //Main Modules
@@ -54,7 +55,8 @@ app.use("/super",SupervisorRouter)
 // Notification System
 app.use("/notify",NotificationRouter)
 
-
+// Admin Features
+app.use("/admin",AdminRouter)
 
 app.use("/styles.css", express.static(path.join(__dirname, "public/styles.css")));
 
@@ -163,19 +165,7 @@ app.get('/profilePic/:fileName', (req:any, res:any) => {
 //--------------------------------------------------------------------------------------------------------------------------
 //                                             Testing Functions Section
 //--------------------------------------------------------------------------------------------------------------------------  
-app.get("/testTemplate", (req, res) => {
-    res.sendFile(path.join(__dirname, "./public/dashboard.html"));
-    // res.sendFile(path.join(__dirname, "./public/login/index.html"));
-  });
 
-  app.get("/api/data",(req,res) =>{
-    res.json({
-        doctorCount:5,
-        patientCount:10,
-        postCount:2,
-        reactionCount:0
-    })
-  })
 app.get("/checkauth",Authenticate,async (req:any,res:any)=>{
     const clientIP = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];

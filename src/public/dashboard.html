@@ -30,18 +30,18 @@
                 <p>Approved on the System</p>
             </div>
             <div class="info_box green">
-                <h4>Reactions</h4>
-                <h1><span id="reactionCount">Loading...</span></h1>
-                <p>Interactions on the Posts</p>
+                <h4>Articles</h4>
+                <h1><span id="articlesCount">Loading...</span></h1>
+                <p>Posted Articles</p>
             </div>
         </div>
     </div>
     <div id="data_section">
         <div class="graph_box">
-a
+            .
         </div>
         <div class="supervisors">
-            <h2>Supervisors</h2>
+            <h2>Supervisors (<span id="SupervisorsCount">...</span>)</h2>
             <div class="superHeader">
                 <input placeholder="Enter Supervisor Email" type="email" id="newEmailInput"/>
                 <button onclick="addSupervisor()">+</button>    
@@ -61,13 +61,21 @@ a
 
     <script>
     async function fetchData() {
-        const response = await fetch("/api/data"); // Adjust the endpoint
-        const data = await response.json();
+        // General Info
+        const response = await fetch("/admin/general"); // Adjust the endpoint
+        var data = await response.json();
 
-        document.getElementById("doctorCount").innerText = data.doctorCount;
-        document.getElementById("patientCount").innerText = data.patientCount;
-        document.getElementById("postCount").innerText = data.postCount;
-        document.getElementById("reactionCount").innerText = data.reactionCount;
+        document.getElementById("doctorCount").innerText = data.doctors;
+        document.getElementById("patientCount").innerText = data.patients;
+        document.getElementById("postCount").innerText = data.posts;
+        document.getElementById("articlesCount").innerText = data.articles;
+    
+        // Supervisors
+        // General Info
+        const response2 = await fetch("/admin/supervisors"); // Adjust the endpoint
+        data = await response2.json();
+        console.log(data)
+        document.getElementById("SupervisorsCount").innerHTML = data.length
     }
 
     async function addSupervisor() {
