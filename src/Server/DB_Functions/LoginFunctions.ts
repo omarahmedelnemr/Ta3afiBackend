@@ -7,6 +7,7 @@ import responseGenerator from "../../middleFunctions/responseGenerator";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import SendMail from "../../middleFunctions/sendMail";
 import { ConfirmCode } from "../../entity/login/confirmationCode";
+import NotificationFunctions from "./NotificationFunctions";
 const bcrypt = require("bcrypt")
 var jwt = require('jsonwebtoken');
 var GoogleStrategy = require( 'passport-google-oauth2' ).Strategy;
@@ -285,6 +286,14 @@ class LoginFunctions{
             const loginRoute = await Database.getRepository(LoginRouter).findOneBy({email:reqData['email']})
             loginRoute.confirmed = true
             await Database.getRepository(LoginRouter).save(loginRoute)
+
+            // Send a Notification for The User
+            if(loginRoute.role ==='patient'){
+                await NotificationFunctions.sendPatientNotification(loginRoute.userID,"System","Your Account Is Verified",'')
+            }else if (loginRoute.role === 'doctor'){
+                await NotificationFunctions.sendDoctorNotification(loginRoute.userID,"System","Your Account Is Verified",'')
+            }
+
             
             // Return to the FrontEnd
             return responseGenerator.sendData("Account Verified")
@@ -321,6 +330,13 @@ class LoginFunctions{
             // Change the Password
             loginInfo.password = await bcrypt.hash(reqData['newPassword'],10)
             await Database.getRepository(LoginRouter).save(loginInfo)
+
+            // Send a Notification for The User
+            if(loginInfo.role ==='patient'){
+                await NotificationFunctions.sendPatientNotification(loginInfo.userID,"System","Your Password Reseted Successfully",'')
+            }else if (loginInfo.role === 'doctor'){
+                await NotificationFunctions.sendDoctorNotification(loginInfo.userID,"System","Your Password Reseted Successfully",'')
+            }
 
             return responseGenerator.sendData("Password Reseted Successfully")
         }catch(err){

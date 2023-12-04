@@ -7,11 +7,13 @@ import { ArticleImages } from "../../entity/Blog/ArticleImages";
 import { ArticleSeen } from "../../entity/Blog/ArticleSeen";
 import { ArticleVotes } from "../../entity/Blog/ArticleVotes";
 import { Categories } from "../../entity/Blog/Categories";
+import { CategorySuggester } from "../../entity/Blog/CategorySuggester";
 import { SavedArticle } from "../../entity/Blog/SavedArticle";
 import { Doctor } from "../../entity/users/Doctor";
 import { Patient } from "../../entity/users/Patient";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import responseGenerater from "../../middleFunctions/responseGenerator";
+import NotificationFunctions from "./NotificationFunctions";
 
 
 class BlogFunctions{
@@ -257,7 +259,7 @@ class BlogFunctions{
     // Make a Doctor Suggest New Category for Blog Articls
     async RequestNewCategory(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['categoryName','description'])){
+        if (checkUndefined(reqData,['doctorID','categoryName','description'])){
             return responseGenerater.missingParam
         }
         try{
@@ -268,6 +270,12 @@ class BlogFunctions{
 
             // Save it to DB
             await Database.getRepository(Categories).save(newCategory)
+
+            // Create a Category Suggestion for Follow-up
+            const suggest = new CategorySuggester()
+            suggest.category = newCategory
+            suggest.doctor   = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+            await Database.getRepository(CategorySuggester).save(suggest)
 
             return responseGenerater.done
 
@@ -544,9 +552,19 @@ class BlogFunctions{
             newUpvote.article = art
             newUpvote.doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
 
+            // Check if the Doctor Exist
+            if (newUpvote.doctor === null){
+                return responseGenerater.notFound
+            }
+
             // Save it to the DB
             await Database.getRepository(ArticleDoctorVotes).save(newUpvote)
             
+
+            // Send a Notification To The Article Writer
+            const notifyText = art.title.length > 20 ? art.title.substring(0, 20) + '...' : art.title;
+            await NotificationFunctions.sendDoctorNotification(art.doctor.id,'Interactions','a Doctor Voted For Your Article',notifyText)
+
             return responseGenerater.done
         }catch(err){
             console.log("Error!\n",err)
@@ -590,7 +608,11 @@ class BlogFunctions{
         }
         try{
             // get Article Info
-            const art = await Database.getRepository(Article).findOneBy({id:reqData['articleID']})
+            const art = await Database.getRepository(Article)
+            .createQueryBuilder("doctorArt")
+            .innerJoinAndSelect("doctorArt.doctor",'doctor')
+            .where("doctorArt.id = :articleID",{articleID:reqData['articleID']})
+            .getOne()
 
             if (art === null){
                 return responseGenerater.notFound
@@ -609,6 +631,10 @@ class BlogFunctions{
 
             // Save it to the DB
             await Database.getRepository(Article).save(newUpvote)
+            
+            // Send a Notification To The Article Writer
+            const notifyText = art.title.length > 20 ? art.title.substring(0, 20) + '...' : art.title;
+            await NotificationFunctions.sendDoctorNotification(art.doctor.id,'Interactions','a Patient Voted For Your Article',notifyText)
             
             return responseGenerater.done
         }catch(err){
@@ -690,8 +716,12 @@ class BlogFunctions{
         try{
             // Get the Doctor and Article Info
             const doctorInfo = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
-            const articleInfo = await Database.getRepository(Article).findOneBy({id:reqData['articleID']})
-            
+            const articleInfo = await Database.getRepository(Article)
+            .createQueryBuilder("doctorArt")
+            .innerJoinAndSelect("doctorArt.doctor",'doctor')
+            .where("doctorArt.id = :articleID",{articleID:reqData['articleID']})
+            .getOne()
+
             // Check if Eny Thing is Missing
             if (doctorInfo === null || articleInfo === null){
                 return responseGenerater.notFound
@@ -707,6 +737,11 @@ class BlogFunctions{
             // Save It To DB
             await Database.getRepository(ArticleComment).save(newComment)
             
+            // Send a Notification To The Article Writer
+            const notifyText = articleInfo.title.length > 20 ? articleInfo.title.substring(0, 20) + '...' : articleInfo.title;
+            await NotificationFunctions.sendDoctorNotification(articleInfo.doctor.id,'Interactions','a Doctor Commented on Your Article',notifyText)
+
+
             return responseGenerater.done
         }catch(err){
             console.log("Error!\n",err)
@@ -776,6 +811,7 @@ class BlogFunctions{
             .createQueryBuilder("ArticleComment")
             .where("ArticleComment.id = :commentID",{commentID:reqData['commentID']})
             .innerJoinAndSelect("ArticleComment.article","article")
+            .innerJoinAndSelect("ArticleComment.doctor","doctor")
             .getOne()
             
             // Check if the Data Exist
@@ -797,6 +833,12 @@ class BlogFunctions{
             // Save to DB
             await Database.getRepository(ArticleCommentsLike).save(newLike)
 
+
+            // Send a Notification To The Comment Writer
+            const notifyText = article.comment.length > 20 ? article.comment.substring(0, 20) + '...' : article.comment;
+            await NotificationFunctions.sendDoctorNotification(article.doctor.id,'Interactions','Someone Reacted on Your Comment',notifyText)
+
+             
             return responseGenerater.done
         }catch(err){
             console.log("Error!\n",err)

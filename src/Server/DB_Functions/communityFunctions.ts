@@ -9,6 +9,7 @@ import { SavedPost } from "../../entity/community/SavedPost";
 import { Patient } from "../../entity/users/Patient";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import responseGenerater from "../../middleFunctions/responseGenerator";
+import NotificationFunctions from "./NotificationFunctions";
 
 
 class CommunityFunctions{
@@ -415,6 +416,15 @@ class CommunityFunctions{
             // Save The Reaction to the DB
             await Database.getRepository(PostReaction).save(newReaction)
             
+            // Send a Notification for Post Writer
+            const writer = await Database.getRepository(Post)
+            .createQueryBuilder("Post")
+            .innerJoinAndSelect("Post.patient",'patient')
+            .where("Post.id = :postID",{postID:reqData['postID']})
+            .getOne()
+            const notifyText = newReaction.post.mainText.length > 20 ? newReaction.post.mainText.substring(0, 20) + '...' : newReaction.post.mainText;
+            await NotificationFunctions.sendPatientNotification(writer.patient.id,'Interactions',"Someone Reacted on Your Post",notifyText)
+
             return responseGenerater.done
         }catch(err){
             console.log("Error!\n",err)
@@ -518,6 +528,16 @@ class CommunityFunctions{
             // Save It To DB
             await Database.getRepository(PostComment).save(newComment)
             
+            // Send a Notification for Post Writer
+            const writer = await Database.getRepository(Post)
+            .createQueryBuilder("Post")
+            .innerJoinAndSelect("Post.patient",'patient')
+            .where("Post.id = :postID",{postID:reqData['postID']})
+            .getOne()
+            const notifyText = newComment.post.mainText.length > 20 ? newComment.post.mainText.substring(0, 20) + '...' : newComment.post.mainText;
+            await NotificationFunctions.sendPatientNotification(writer.patient.id,'Interactions',"Someone Added a Comment on Your Post",notifyText)
+
+
             return responseGenerater.done
         }catch(err){
             console.log("Error!\n",err)
@@ -609,6 +629,16 @@ class CommunityFunctions{
             
             // Save to DB
             await Database.getRepository(PostCommentsReaction).save(newLike)
+
+            // Send a Notification for Comment Writer
+            const writer = await Database.getRepository(PostComment)
+            .createQueryBuilder("PostComment")
+            .innerJoinAndSelect("PostComment.patient",'patient')
+            .where("PostComment.id = :commentID",{commentID:reqData['commentID']})
+            .getOne()
+            const notifyText = newLike.comment.comment.length > 20 ?  newLike.comment.comment.substring(0, 20) + '...' :  newLike.comment.comment;
+            await NotificationFunctions.sendPatientNotification(writer.patient.id,'Interactions',"Someone Reacted on Your Comment",notifyText)
+
 
             return responseGenerater.done
         }catch(err){

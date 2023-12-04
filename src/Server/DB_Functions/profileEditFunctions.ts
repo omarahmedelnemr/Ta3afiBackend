@@ -18,6 +18,7 @@ import { Diagnose } from "../../entity/PatientInfo/Diagnosis";
 import { Medicine } from "../../entity/PatientInfo/Medicine";
 import { PrescriptionFile } from "../../entity/PatientInfo/PrescriptionFile";
 import { PatientAccountInfo } from "../../entity/PatientInfo/patientAccountInfo";
+import NotificationFunctions from "./NotificationFunctions";
 const bcrypt = require("bcrypt")
 
 class profileEditFunctions{
@@ -78,7 +79,13 @@ class profileEditFunctions{
                 .from(ConfirmCode)
                 .where("email = :email", { email: reqData['newEmail'] })
                 .execute()
-
+                
+                // Send Notification to The User
+                if (loginInfo.role === 'patient'){
+                    await NotificationFunctions.sendPatientNotification(loginInfo.userID,'System',"You Changed Your Email Successfully","")
+                }else if (loginInfo.role === 'doctor'){
+                    await NotificationFunctions.sendDoctorNotification(loginInfo.userID,'System',"You Changed Your Email Successfully","")
+                }
                 return responseGenerator.done
             }
         }catch(err){
@@ -112,6 +119,14 @@ class profileEditFunctions{
 
             // Send Notification Mail
             SendMail(reqData['email'],"Password Changed","Hello,\nWe Would Like to Tell You That You Changed Your Password Successfully,\nif You are not the One who Change It, please Contact us Immediately")
+            
+            // Send Notification on the System
+            if (loginInfo.role === 'patient'){
+                await NotificationFunctions.sendPatientNotification(loginInfo.userID,'System',"Password Changed","")
+            }else if (loginInfo.role === 'doctor'){
+                await NotificationFunctions.sendDoctorNotification(loginInfo.userID,'System',"Password Changed","")
+            }
+
             return responseGenerator.sendData("Password Changed Successfully")
             
         }catch(err){
@@ -172,6 +187,9 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Doctor).save(doctor)
 
+        // Send in-app Notification
+        await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Changed Your Name Successfully",'')
+
         return responseGenerator.done
     }
 
@@ -193,6 +211,9 @@ class profileEditFunctions{
 
         // Save Changes To DB
         await Database.getRepository(Doctor).save(doctor)
+
+        // Send in-app Notification
+        await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Edited Your Title Successfully",'')
 
         return responseGenerator.done
     }
@@ -216,6 +237,10 @@ class profileEditFunctions{
 
             // Save Changes To DB
             await Database.getRepository(Doctor).save(doctor)
+
+            // Send in-app Notification
+            await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Edited Your Birth Date Successfully",'')
+            
             return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
@@ -242,6 +267,10 @@ class profileEditFunctions{
 
             // Save Changes To DB
             await Database.getRepository(Doctor).save(doctor)
+
+            // Send in-app Notification
+            await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Changes Profile Picture Successfully",'')
+
             return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
@@ -268,6 +297,10 @@ class profileEditFunctions{
 
             // Save Changes To DB
             await Database.getRepository(Doctor).save(doctor)
+
+            // Send in-app Notification
+            await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Edited Description Successfully",'')
+
             return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
@@ -874,6 +907,10 @@ class profileEditFunctions{
             // Save Changes
             await Database.getRepository(Doctor).save(doc)
 
+            // Send in-app Notification
+            const Stat = reqData['online']? "online":"offline"
+            await NotificationFunctions.sendDoctorNotification(doc.id,"System",`You Are ${Stat} Now`,'')
+
             return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
@@ -1084,6 +1121,9 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Patient).save(patient)
 
+        // Send in-app Notification
+        await NotificationFunctions.sendDoctorNotification(patient.id,"Profile Edit","You Have Changed Your Name Successfully",'')
+
         return responseGenerator.done
     }
 
@@ -1106,6 +1146,9 @@ class profileEditFunctions{
         // Save Changes To DB
         await Database.getRepository(Patient).save(patient)
 
+        // Send in-app Notification
+        await NotificationFunctions.sendDoctorNotification(patient.id,"Profile Edit","You Have Edited Your Birth Date Successfully",'')
+
         return responseGenerator.done
     }
 
@@ -1127,6 +1170,9 @@ class profileEditFunctions{
 
         // Save Changes To DB
         await Database.getRepository(Patient).save(patient)
+
+        // Send in-app Notification
+        await NotificationFunctions.sendDoctorNotification(patient.id,"Profile Edit","You Have Changes Your Profile Picture Successfully",'')
 
         return responseGenerator.done
     }
