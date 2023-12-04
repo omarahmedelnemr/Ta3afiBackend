@@ -8,7 +8,7 @@ import { DoctorNotification } from "../../entity/DoctorInfo/DoctorNotification";
 import { Doctor } from "../../entity/users/Doctor";
 const bcrypt = require("bcrypt")
 
-class Notification{
+class Notification{ //Add The Count
     //-------------------------------------------------------------------------------------------
     //--------------------------------- Patient Notifications -----------------------------------
     //-------------------------------------------------------------------------------------------
@@ -59,6 +59,24 @@ class Notification{
 
             }
               return responseGenerator.done
+        }catch(err){
+            console.log("Error!!\n",err)
+            return responseGenerator.Error
+        }
+    }
+
+    // Get Patient unseen Notifications Count
+    async getPatientNotificationCount(reqData){
+        // Check Parameter Existence
+        const checkParam = checkUndefined(reqData,['patientID'])
+        if(checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
+        }
+
+        try{
+            const NotificationCount = await Database.getRepository(PatientNotification).countBy({patient:{id:reqData['patientID']},seen:false})         
+            return responseGenerator.sendData({"newNotifications":NotificationCount})
+
         }catch(err){
             console.log("Error!!\n",err)
             return responseGenerator.Error
@@ -192,6 +210,24 @@ class Notification{
 
             }
               return responseGenerator.done
+        }catch(err){
+            console.log("Error!!\n",err)
+            return responseGenerator.Error
+        }
+    }
+
+    // Get Doctor unseen Notifications Count
+    async getDoctorNotificationCount(reqData){
+        // Check Parameter Existence
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if(checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
+        }
+
+        try{
+            const NotificationCount = await Database.getRepository(DoctorNotification).countBy({doctor:{id:reqData['doctorID']},seen:false})         
+            return responseGenerator.sendData({"newNotifications":NotificationCount})
+
         }catch(err){
             console.log("Error!!\n",err)
             return responseGenerator.Error

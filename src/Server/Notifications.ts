@@ -19,6 +19,12 @@ router.post("/send-patient-notification", getCorsAccess, Authenticate, async (re
     res.status(response['status']).json(response['data'])
 })
 
+// Get The Count of All Unseen Patient Notifications
+router.get("/patient-notification-count", getCorsAccess, Authenticate, async (req,res)=>{
+    const response = await  Notification.getPatientNotificationCount(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
 // Get The List of All Patient Notifications
 router.get("/patient-notification", getCorsAccess, Authenticate, async (req,res)=>{
     const response = await  Notification.getPatientNotificationList(req.query)
@@ -44,6 +50,12 @@ router.delete("/all-patient-notification", getCorsAccess, Authenticate, async (r
 // Send a Notification for a Doctor  (used in Private Files as well, that Way Parameters are Hardcoded)
 router.post("/send-doctor-notification", getCorsAccess, Authenticate, async (req,res)=>{
     const response = await  Notification.sendDoctorNotification(req.body.patientID,req.body.category,req.body.header,req.body.text)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get The Count of All Unseen Doctor Notifications
+router.get("/doctor-notification-count", getCorsAccess, Authenticate, async (req,res)=>{
+    const response = await  Notification.getDoctorNotificationCount(req.query)
     res.status(response['status']).json(response['data'])
 })
 
