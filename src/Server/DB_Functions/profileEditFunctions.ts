@@ -269,7 +269,7 @@ class profileEditFunctions{
             await Database.getRepository(Doctor).save(doctor)
 
             // Send in-app Notification
-            await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Changes Profile Picture Successfully",'')
+            await NotificationFunctions.sendDoctorNotification(doctor.id,"Profile Edit","You Have Changes Your Profile Picture Successfully",'')
 
             return responseGenerator.done
         }catch(err){

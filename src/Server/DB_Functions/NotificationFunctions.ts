@@ -6,6 +6,7 @@ import responseGenerator from "../../middleFunctions/responseGenerator";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import { DoctorNotification } from "../../entity/DoctorInfo/DoctorNotification";
 import { Doctor } from "../../entity/users/Doctor";
+import dictionary from "../../middleFunctions/dictionary";
 const bcrypt = require("bcrypt")
 
 class Notification{ //Add The Count
@@ -44,9 +45,9 @@ class Notification{ //Add The Count
               // Create New Notification
               if (LatestNotification === null){
                 const newNotification    = new PatientNotification()
-                newNotification.category = category
                 newNotification.date     = new Date()
-                newNotification.header   = header
+                newNotification.category = dictionary[category.toLowerCase()] !== undefined ? dictionary[category.toLowerCase()][patient.language]:category    // Used to Translate all Notification Categories to User Lang
+                newNotification.header   = dictionary[header.toLowerCase()] !== undefined ? dictionary[header.toLowerCase()][patient.language]: header   // Used to Translate all Notification Categories to User Lang
                 newNotification.text     = text
                 newNotification.patient  = patient
 
@@ -195,10 +196,9 @@ class Notification{ //Add The Count
               // Create New Notification
               if (LatestNotification === null){
                 const newNotification    = new DoctorNotification()
-                newNotification.category = category
                 newNotification.date     = new Date()
-                newNotification.header   = header
-                newNotification.text     = text
+                newNotification.category = dictionary[category.toLowerCase()] !== undefined ? dictionary[category.toLowerCase()][doctor.language]:category    // Used to Translate all Notification Categories to User Lang
+                newNotification.header   = dictionary[header.toLowerCase()] !== undefined ? dictionary[header.toLowerCase()][doctor.language]: header   // Used to Translate all Notification Categories to User Lang                newNotification.text     = text
                 newNotification.doctor  = doctor
 
                 await Database.getRepository(DoctorNotification).save(newNotification)

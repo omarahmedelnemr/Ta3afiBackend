@@ -73,7 +73,7 @@ class SupervisorFunction{
             }
             
             const stat = reqData['approve'] ? "Approved":"Declined"
-            await NotificationFunctions.sendDoctorNotification(writer.doctor.id,'System',`Your Category Request Had Been ${stat}`,`Category: ${category.category}`)
+            await NotificationFunctions.sendDoctorNotification(writer.doctor.id,'System',`Your Category Request Had Been ${stat}`,category.category)
 
             return responseGenerator.done
         }catch(err){
