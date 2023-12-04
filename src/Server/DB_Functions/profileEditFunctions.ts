@@ -926,6 +926,9 @@ class profileEditFunctions{
             return responseGenerator.sendMissingParam(checkParam)
         }
         try{
+            if (reqData['language'] !== 'ar' && reqData['language'] !== "en"){
+                return responseGenerator.sendError("un-Supported Language, Supported are: ar,en")
+            }
             // Get Doctor Data
             const doc = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             
@@ -941,6 +944,9 @@ class profileEditFunctions{
             // Modify the Entity
             doc.language = reqData['language']
             await Database.getRepository(Doctor).save(doc)
+
+            // Translate Notifications
+            await NotificationFunctions.TranslateAllSentDoctorNotifications(reqData)
 
             return responseGenerator.done
         }catch(err){

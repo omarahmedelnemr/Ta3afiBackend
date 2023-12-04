@@ -6,7 +6,9 @@ import responseGenerator from "../../middleFunctions/responseGenerator";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import { DoctorNotification } from "../../entity/DoctorInfo/DoctorNotification";
 import { Doctor } from "../../entity/users/Doctor";
-import dictionary from "../../middleFunctions/dictionary";
+import dictionary from "../../middleFunctions/localDictionary";
+
+
 const bcrypt = require("bcrypt")
 
 class Notification{ //Add The Count
@@ -161,6 +163,31 @@ class Notification{ //Add The Count
         }
     }
 
+    // Translate Patient All Notifications
+    async TranslateAllSentPatientNotifications(reqData){
+        // Check Parameter Existence
+        const checkParam = checkUndefined(reqData,['patientID'])
+        if(checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
+        }
+        try{
+            //  Get All Notifications
+            const notificationList = await Database.getRepository(PatientNotification).findBy({patient:{id:reqData['patientID']}})
+            const patient = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
+
+            for (var notify of notificationList){
+                notify.category = dictionary[notify.category.toLowerCase()] === undefined ? notify.category : dictionary[notify.category.toLowerCase()][patient.language]
+                notify.header = dictionary[notify.header.toLowerCase()] === undefined ? notify.header : dictionary[notify.header.toLowerCase()][patient.language]
+                await Database.getRepository(PatientNotification).save(notify)
+            }
+
+            return responseGenerator.done
+        }catch(err){
+            console.log("Error!!\n",err)
+            return responseGenerator.Error
+        }
+    }
+
     //-------------------------------------------------------------------------------------------
     //--------------------------------- Doctor Notifications ------------------------------------
     //-------------------------------------------------------------------------------------------
@@ -307,6 +334,31 @@ class Notification{ //Add The Count
 
             return responseGenerator.done
             
+        }catch(err){
+            console.log("Error!!\n",err)
+            return responseGenerator.Error
+        }
+    }
+
+    // Translate Doctor All Notifications
+    async TranslateAllSentDoctorNotifications(reqData){
+        // Check Parameter Existence
+        const checkParam = checkUndefined(reqData,['doctorID'])
+        if(checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
+        }
+        try{
+            //  Get All Notifications
+            const notificationList = await Database.getRepository(DoctorNotification).findBy({doctor:{id:reqData['doctorID']}})
+            const doctor = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
+
+            for (var notify of notificationList){
+                notify.category = dictionary[notify.category.toLowerCase()] === undefined ? notify.category : dictionary[notify.category.toLowerCase()][doctor.language]
+                notify.header = dictionary[notify.header.toLowerCase()] === undefined ? notify.header : dictionary[notify.header.toLowerCase()][doctor.language]
+                await Database.getRepository(DoctorNotification).save(notify)
+            }
+
+            return responseGenerator.done
         }catch(err){
             console.log("Error!!\n",err)
             return responseGenerator.Error
