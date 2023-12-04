@@ -37,8 +37,10 @@ class BlogFunctions{
 
     // Get all Articles With a Category or Not
     async GetAllArticleList(reqData){
-        if (checkUndefined(reqData,['loadBlock'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParam  = checkUndefined(reqData,['loadBlock'])
+        if (checkParam){
+            return responseGenerater.sendMissingParam(checkParam)
         }
         try{
             var allArticles;
@@ -105,11 +107,13 @@ class BlogFunctions{
             return responseGenerater.Error
         }
     }
-    
+
     // Search for an Article By Name
     async SearchForArticleByTitle(reqData){
-        if (checkUndefined(reqData,['searchTitle',"loadBlock"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParam  = checkUndefined(reqData,['searchTitle',"loadBlock"])
+        if (checkParam){
+            return responseGenerater.sendMissingParam(checkParam)
         }
         try{
             const allArticles = await Database.getRepository(Article)
@@ -146,8 +150,9 @@ class BlogFunctions{
     // View a Single Article
     async ViewAnArticle(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['articleID'])){
-            return responseGenerater.missingParam
+        const checkParam  = checkUndefined(reqData,['articleID'])
+        if (checkParam){
+            return responseGenerater.sendMissingParam(checkParam)
         }
         try{
 
@@ -204,8 +209,9 @@ class BlogFunctions{
 
     // Get All Article Comments
     async GetArticleComments(reqData){
-        if(checkUndefined(reqData,['articleID',"loadBlock"])){
-            return  responseGenerater.missingParam
+        const checkParam = checkUndefined(reqData,['articleID',"loadBlock"]);
+        if(checkParam){
+            return  responseGenerater.missingParam;
         }
         try{
             const commmentList = await Database.getRepository(ArticleComment)
@@ -252,6 +258,7 @@ class BlogFunctions{
         }
     }
 
+
     //-------------------------------------------------------------------------------------------
     //------------------------------- Doctor Article Handling -----------------------------------
     //-------------------------------------------------------------------------------------------
@@ -259,8 +266,9 @@ class BlogFunctions{
     // Make a Doctor Suggest New Category for Blog Articls
     async RequestNewCategory(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['doctorID','categoryName','description'])){
-            return responseGenerater.missingParam
+        const checkParams =checkUndefined(reqData,['doctorID','categoryName','description'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Create New Not Approved Category that is Waiting to Be Approved
@@ -289,8 +297,9 @@ class BlogFunctions{
     // Get all Articles Related to a Doctor
     async GetDoctorArticleList(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['doctorID',"loadBlock"])){
-            return responseGenerater.missingParam
+        const checkParams =checkUndefined(reqData,['doctorID',"loadBlock"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // get and Send the List
@@ -334,8 +343,9 @@ class BlogFunctions{
     // Make a Doctor Post New Article
     async postNewArticle(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['doctorID','coverImage','title','mainText','date','categoryID'])){
-            return responseGenerater.missingParam
+        const checkParams = checkUndefined(reqData,['doctorID','coverImage','title','mainText','date','categoryID'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Create New Article
@@ -378,8 +388,9 @@ class BlogFunctions{
     // Make a Doctor Edit His Posted Article
     async EditArticle(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['articleID','covorImage','doctorID','title','mainText','date','categoryID'])){
-            return responseGenerater.missingParam
+        const checkParams = checkUndefined(reqData,['articleID','covorImage','doctorID','title','mainText','date','categoryID'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // get The Article info If Exist
@@ -429,8 +440,9 @@ class BlogFunctions{
     // Make a Doctor Remove his Posted Article
     async DeleteArticle(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['articleID','doctorID'])){
-            return responseGenerater.missingParam
+        const checkParams = checkUndefined(reqData,['articleID','doctorID'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check If Article Exist
@@ -522,8 +534,9 @@ class BlogFunctions{
     // Doctors can Upvote for an Article
     async DoctorUpVote(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,["doctorID","articleID"])){
-            return responseGenerater.missingParam
+        const checkParams = checkUndefined(reqData,["doctorID","articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // get Article Info
@@ -574,8 +587,10 @@ class BlogFunctions{
 
     // Remove Doctor Up Vote
     async RemoveDoctorUpvote(reqData){
-        if (checkUndefined(reqData,['doctorID','articleID'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["doctorID","articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if the Doctor Vote
@@ -603,8 +618,9 @@ class BlogFunctions{
     // Patient can Upvote for an Article
     async PatientUpVote(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,["patientID","articleID"])){
-            return responseGenerater.missingParam
+        const checkParams = checkUndefined(reqData,["patientID","articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // get Article Info
@@ -645,8 +661,10 @@ class BlogFunctions{
 
     // Remove Patient Up Vote
     async RemovePatientUpvote(reqData){
-        if (checkUndefined(reqData,['patientID','articleID'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID","articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if the Patient Vote
@@ -673,8 +691,10 @@ class BlogFunctions{
 
     // Mark an Article as Seen
     async PatientMarkAsSeen(reqData){
-        if(checkUndefined(reqData,['patientID','articleID'])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID","articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if the Patient See this Article Already
@@ -710,8 +730,10 @@ class BlogFunctions{
 
     // Doctor Comment
     async DoctorAddComment(reqData){
-        if(checkUndefined(reqData,['doctorID',"articleID","comment","date"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['doctorID',"articleID","comment","date"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Get the Doctor and Article Info
@@ -751,8 +773,10 @@ class BlogFunctions{
 
     // Doctor Remove his Comment
     async RemoveDoctorComment(reqData){
-        if(checkUndefined(reqData,["doctorID",'commentID'])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["doctorID",'commentID'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Get Comment Info
@@ -795,8 +819,10 @@ class BlogFunctions{
 
     // Doctors Add Likes to a comment
     async DoctorLikeComment(reqData){
-        if(checkUndefined(reqData,['doctorID','commentID'])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["doctorID",'commentID'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if The Doctor Like it Already
@@ -848,8 +874,10 @@ class BlogFunctions{
 
     // Remove a Like from A Comment
     async RemoveCommentLike(reqData){
-        if(checkUndefined(reqData,['commentID',"doctorID"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["doctorID",'commentID'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if The Doctor Like it Already
@@ -882,8 +910,10 @@ class BlogFunctions{
 
     // Patient Saving this Article in Saved List
     async GetAllSavedList(reqData){
-        if (checkUndefined(reqData,['patientID',"loadBlock"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['patientID',"loadBlock"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // get and Send the List
@@ -928,8 +958,10 @@ class BlogFunctions{
 
     // Patient Saving this Article in Saved List
     async saveArticleToSavedList(reqData){
-        if (checkUndefined(reqData,['patientID',"articleID"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['patientID',"articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Make New Saved Entity
@@ -955,8 +987,10 @@ class BlogFunctions{
 
     // Patient Remove this Article From Saved List
     async RemoveArticleFromSavedList(reqData){
-        if (checkUndefined(reqData,['patientID',"articleID"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['patientID',"articleID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Make New Saved Entity

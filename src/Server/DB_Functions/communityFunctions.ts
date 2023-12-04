@@ -33,8 +33,10 @@ class CommunityFunctions{
 
     // Get all Posts With a Category or Not
     async GetPostsFeed(reqData){
-        if(checkUndefined(reqData,['loadBlock'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['loadBlock'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             var allPosts;
@@ -116,8 +118,10 @@ class CommunityFunctions{
     
     // Search for an Post By Its Text (main Text)
     async SearchForPostByText(reqData){
-        if (checkUndefined(reqData,['searchText','loadBlock'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["searchText",'loadBlock'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             const allPosts = await Database.getRepository(Post)
@@ -172,8 +176,10 @@ class CommunityFunctions{
 
     // Get a User's Post That He Posts
     async GetPatientPosts(reqData){
-        if(checkUndefined(reqData,['patientID',"loadBlock"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID",'loadBlock'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Getting All Posts Related to a User
@@ -230,8 +236,10 @@ class CommunityFunctions{
 
     // User can Write a Post
     async WritePost(reqData){
-        if (checkUndefined(reqData,["patientID","communityID","mainText",'date','hideIdentity'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID","communityID","mainText",'date','hideIdentity'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Create New Post Entity
@@ -270,8 +278,10 @@ class CommunityFunctions{
 
     // Edit an Existing Post
     async EditPost(reqData){
-        if (checkUndefined(reqData,["patientID","postID","communityID","mainText",'editDate','hideIdentity'])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID","postID","communityID","mainText",'editDate','hideIdentity'])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Get and Check The Post Info
@@ -324,8 +334,9 @@ class CommunityFunctions{
     // Delete a Post With the Related Data
     async DeletePost(reqData){
         // Check Parameter Existence
-        if (checkUndefined(reqData,['postID','patientID'])){
-            return responseGenerater.missingParam
+        const checkParams = checkUndefined(reqData,["patientID","postID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check If Post Exist
@@ -399,8 +410,10 @@ class CommunityFunctions{
 
     // Patient React on a Post
     async ReactOnPost(reqData){
-        if(checkUndefined(reqData,['patientID',"postID","reaction"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID","postID","reaction"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             const newReaction    = new PostReaction()
@@ -434,8 +447,10 @@ class CommunityFunctions{
 
     // Patient can Remove React on a Post
     async RemoveReactOnPost(reqData){
-        if(checkUndefined(reqData,['patientID',"postID"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["patientID","postID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             const newReaction    = await Database.getRepository(PostReaction).findOneBy({post:{id:reqData['postID']},patient:{id:reqData['patientID']}})
@@ -464,8 +479,10 @@ class CommunityFunctions{
 
     // Get All Post Comments
     async GetPostComments(reqData){
-        if(checkUndefined(reqData,['postID','loadBlock'])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,["loadBlock","postID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             const commmentList = await Database.getRepository(PostComment)
@@ -505,8 +522,10 @@ class CommunityFunctions{
 
     // Patient Can Comment on a Post
     async AddComment(reqData){
-        if(checkUndefined(reqData,['patientID',"postID","comment","date"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['patientID',"postID","comment","date"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Get the Patient and Post Info
@@ -592,8 +611,10 @@ class CommunityFunctions{
 
     // Pateint can Add Reactions to a comment
     async ReactOnComment(reqData){
-        if(checkUndefined(reqData,['patientID','commentID',"reaction"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['patientID','commentID',"reaction"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if The Patient React on it Already
@@ -649,8 +670,10 @@ class CommunityFunctions{
 
     // Remove a Reaction from A Comment
     async RemoveCommentReaction(reqData){
-        if(checkUndefined(reqData,['commentID',"patientID"])){
-            return  responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['commentID',"patientID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if The Patient React on it Already
@@ -683,8 +706,10 @@ class CommunityFunctions{
 
     // Patient Saving this Post in Saved List
     async GetAllSavedList(reqData){
-        if (checkUndefined(reqData,['patientID',"loadBlock"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['loadBlock',"patientID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // get and Send the List
@@ -729,8 +754,10 @@ class CommunityFunctions{
 
     // Patient Saving this Post in Saved List
     async savePostToSavedList(reqData){
-        if (checkUndefined(reqData,['patientID',"postID"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['postID',"patientID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Check if the User Didn't Save it Already
@@ -762,8 +789,10 @@ class CommunityFunctions{
 
     // Patient Remove this Post From Saved List
     async RemovePostFromSavedList(reqData){
-        if (checkUndefined(reqData,['patientID',"postID"])){
-            return responseGenerater.missingParam
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['postID',"patientID"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
         }
         try{
             // Make New Saved Entity
