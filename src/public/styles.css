@@ -1,0 +1,121 @@
+body{
+    background-color: #f7faff;
+    font-family: sans-serif;
+
+}
+#info_boxes_section{
+   display: flex;
+   flex-direction: row;
+   justify-content: space-around;
+   align-items: center;
+   flex-wrap: wrap;
+   /* width: 100%; */
+}
+.row{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+.column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#info_boxes_section .info_box{
+    border-radius: 10px;
+    color: white;
+    flex-basis: 20%;
+    padding: 1% 2%;
+    margin: 10px -2px;
+    min-width: 250px;
+    transition: 0.2s;
+}
+
+#info_boxes_section .info_box.blue{
+    background-color: #3b76ef;
+
+}
+#info_boxes_section .info_box.sky{
+    background-color: #63c7ff;
+
+}
+#info_boxes_section .info_box.purple{
+    background-color: #a66dd4;
+
+}
+#info_boxes_section .info_box.green{
+    background-color: #6dd4b1;
+
+}
+#info_boxes_section .info_box:hover{
+    background-color: #4c83f0;
+}
+
+/* #info_boxes_section .info_box h4{
+
+}
+#info_boxes_section .info_box h2{
+
+}
+#info_boxes_section .info_box p{
+
+} */
+
+#data_section{
+    display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: center;
+   flex-wrap: wrap;   
+   padding: 10px;
+}
+
+#data_section .graph_box{
+    flex-basis: 45%;
+    padding: 2%;;
+    height: 100%;
+    border-radius: 10px;
+    background-color: white;
+}
+#data_section .supervisors{
+    flex-basis: 45%;
+    padding: 1%;
+    background-color: white;
+}
+#data_section .supervisors .superHeader{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+#data_section .supervisors .superHeader input{
+    flex-basis: 70%;
+    height: 30px;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 10px;
+    border:1px solid gray;
+}
+#data_section .supervisors .superHeader button{
+    flex-basis: 10%;
+    border-radius: 10px;
+    border:1px solid gray;
+    background-color:#3b76ef;
+    color: white;
+    font-size: 30px;
+}
+#data_section .supervisors .supervisor_block{
+    list-style: none;
+    font-size: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #e3e3e3;
+    margin: 10px;
+    transition: 0.5s;
+}
+#data_section .supervisors .supervisor_block:hover{
+    background-color: #b2b2b3;
+
+}

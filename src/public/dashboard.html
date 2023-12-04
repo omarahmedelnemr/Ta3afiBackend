@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel = "stylesheet" type="text/css" href="/styles.css"/>
+  <title>Dashboard</title>
+</head>
+<body>
+    <div id="side_navbar">
+
+    </div>
+    <div id="main_page">
+        <h1>Dashboard</h1>
+        <div id="info_boxes_section">
+            <div class="info_box blue">
+                <h4>Doctors</h4>
+                <h1> <span id="doctorCount">Loading...</span></h1>
+                <p>Active of Doctors</p>
+            </div>
+            <div class="info_box sky">
+                <h4>Patients</h4>
+                <h1> <span id="patientCount">Loading...</span></h1>
+                <p>Active of Patients</p>
+            </div>
+            <div class="info_box purple">
+                <h4>Posts</h4>
+                <h1> <span id="postCount">Loading...</span></h1>
+                <p>Approved on the System</p>
+            </div>
+            <div class="info_box green">
+                <h4>Reactions</h4>
+                <h1><span id="reactionCount">Loading...</span></h1>
+                <p>Interactions on the Posts</p>
+            </div>
+        </div>
+    </div>
+    <div id="data_section">
+        <div class="graph_box">
+a
+        </div>
+        <div class="supervisors">
+            <h2>Supervisors</h2>
+            <div class="superHeader">
+                <input placeholder="Enter Supervisor Email" type="email" id="newEmailInput"/>
+                <button onclick="addSupervisor()">+</button>    
+            </div>
+            <div class="superList">
+                <ul>
+                    <li class="supervisor_block">omar ahemd  -> omar@gmail.com</li>
+                    <li class="supervisor_block">omar ahemd  -> omar@gmail.com</li>
+                    <li class="supervisor_block">omar ahemd  -> omar@gmail.com</li>
+                    <li class="supervisor_block">omar ahemd  -> omar@gmail.com</li>
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+    async function fetchData() {
+        const response = await fetch("/api/data"); // Adjust the endpoint
+        const data = await response.json();
+
+        document.getElementById("doctorCount").innerText = data.doctorCount;
+        document.getElementById("patientCount").innerText = data.patientCount;
+        document.getElementById("postCount").innerText = data.postCount;
+        document.getElementById("reactionCount").innerText = data.reactionCount;
+    }
+
+    async function addSupervisor() {
+        const email = document.getElementById("newEmailInput").value
+        console.log(email)
+        if (email === ''){
+            alert("You Enterd Empty Email")
+            return;
+        }else if(email.includes("@") === false){
+            alert("You Enterd Wrong Email Format")
+            return;
+        }
+        if (email) {
+        await fetch("/addSupervisor", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email }),
+        });
+        alert("Supervisor Email Sent successfully!");
+        }
+    }
+
+    fetchData();
+    </script>
+</body>
+</html>
