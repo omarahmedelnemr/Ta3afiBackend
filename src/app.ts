@@ -5,6 +5,7 @@ import profileRouter from './Server/profileEdits'
 import blogRouter from './Server/blog'
 import communityRouter from './Server/community'
 import SupervisorRouter from './Server/supervisor'
+import NotificationRouter from './Server/Notifications'
 
 
 //Main Modules
@@ -50,6 +51,8 @@ app.use("/community",communityRouter)
 // Supervisors Functionality
 app.use("/super",SupervisorRouter)
 
+// Notification System
+app.use("/notify",NotificationRouter)
 
 // Base endpoint to Test That API is Working
 app.get('/',async (req,res)=>{

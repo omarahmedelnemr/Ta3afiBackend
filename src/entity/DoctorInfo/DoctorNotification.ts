@@ -1,20 +1,20 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, ManyToOne, JoinColumn } from "typeorm"
-import { Patient } from "../users/Patient"
+import { Doctor } from "../users/Doctor"
 
 @Entity()
 @Unique(['id'])
-export class PatientNotification{
+export class DoctorNotification{
     
     @PrimaryGeneratedColumn()
     id:string
 
     @Column({default:1,comment:"Used to Avoid Duplicated Notifications, instead Count Them up and Combine Them"})
     counter:number
-    
+
     @Column({comment:"This Categorize The Notifications, Like 'interaction' for Likes and Comments, and 'System' For System Alert"})
     category:string 
-
-    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    
+    @Column()
     date:Date
     
     @Column()
@@ -26,7 +26,7 @@ export class PatientNotification{
     @Column({default:false})
     seen:boolean
 
-    @ManyToOne(()=>Patient,patientID=>patientID.id)
+    @ManyToOne(()=>Doctor,DoctorID=>DoctorID.id)
     @JoinColumn()
-    patient:Patient
+    doctor:Doctor
 }
