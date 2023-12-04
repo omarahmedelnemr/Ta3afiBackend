@@ -1525,6 +1525,9 @@ class profileEditFunctions{
             patient.language = reqData['language']
             await Database.getRepository(Patient).save(patient)
 
+            // Translate Notifications
+            await NotificationFunctions.TranslateAllSentPatientNotifications(reqData)
+
             return responseGenerator.done
         }catch(err){
             console.log("Error!\n",err)
