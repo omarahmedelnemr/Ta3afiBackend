@@ -31,4 +31,34 @@ router.get("/supervisors", getCorsAccess, async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Get Posts activity over Months
+router.get("/posts-activity", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.getPostsActivityOverTime(req.query);
+    res.status(response['status']).json(response['data']);
+});
+
+// Get Article activity over Months
+router.get("/article-activity", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.getArticleActivityOverTime(req.query);
+    res.status(response['status']).json(response['data']);
+});
+
+// Create a Signup Link For Supervisors
+router.post("/supervisor-signup-link", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.createSupervisorSignupLink(req.body);
+    res.status(response['status']).json(response['data']);
+});
+
+// Add New Supervisor (Supervisor Signup)
+router.post("/add-supervisor", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.addNewSupervisor(req.body);
+    res.status(response['status']).json(response['data']);
+});
+
+// Remove a Supervisor
+router.delete("/remove-supervisor", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.removeSupervisor(req.body);
+    res.status(response['status']).json(response['data']);
+});
+
 export default router

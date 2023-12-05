@@ -70,15 +70,84 @@ class AdminFunctions{
     }
 
     // get Posts activity over Time
+    async getPostsActivityOverTime(reqData) {
+        try {
+    
+            // Group by month and count posts
+            const postsActivity = await Database.getRepository(Post).createQueryBuilder("post")
+                .select("DATE_FORMAT(post.date, '%Y-%m') AS month")
+                .addSelect("COUNT(post.id) AS postCount")
+                .groupBy("month")
+                .getRawMany();
+    
+            // // Convert the result to a dictionary
+            // const postsActivityDictionary = postsActivity.reduce((acc, entry) => {
+            //     acc[entry.month] = entry.postCount;
+            //     return acc;
+            // }, {});
+    
+            return responseGenerater.sendData(postsActivity);
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
+    }
 
-    // get Articale activity over Time
+    // Get Article activity over Time
+    async getArticleActivityOverTime(reqData) {
+        try {
+            // Group by month and count Articles
+            const articlesActivity = await Database.getRepository(Article).createQueryBuilder("Article")
+            .select("DATE_FORMAT(Article.date, '%Y-%m') AS month")
+            .addSelect("COUNT(Article.id) AS articleCount")
+            .groupBy("month")
+            .getRawMany();
 
-    // get Number of Active Users over Time
+            return responseGenerater.sendData(articlesActivity);
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
+    }
 
-    // Add New Supervisor
+    // Create a Signup Link For Supervisors
+    async createSupervisorSignupLink(reqData) {
+        try {
+            // Your logic to create a signup link for supervisors
+            // ...
 
-    // remove a Supervisor
+            // return responseGenerater.sendData(signupLink);
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
+    }
 
+    // Add New Supervisor (Supervisor Signup)
+    async addNewSupervisor(reqData) {
+        try {
+            // Your logic to add a new supervisor
+            // ...
+
+            // return responseGenerater.sendData(newSupervisorData);
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
+    }
+
+    // Remove a Supervisor
+    async removeSupervisor(supervisorId) {
+        try {
+            // Your logic to remove a supervisor
+            // ...
+
+            return responseGenerater.sendData({ message: "Supervisor removed successfully" });
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
+    }
 }
 
 export default new AdminFunctions();
