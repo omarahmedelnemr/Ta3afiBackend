@@ -1,0 +1,206 @@
+<!-- index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.io Chat App</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js" integrity="sha384-mZLF4UVrpi/QTWPA7BjNPEnkIfRFn4ZEO3Qt/HFklTJBj/gBOV8G3HcKn4NfQblz" crossorigin="anonymous"></script>
+    <style>
+        body{
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            height: 100vh;
+        }
+        #chatroomList{
+            border: 1px solid black;
+            padding: 10px;
+            margin: 0px 20px;
+            height: 100%;
+            width: 200px;
+        }
+        #chatroomList .chatroom{
+            background-color: lightgray;
+            padding: 10px;
+            margin: 10px;
+            transition: 0.5s;
+            cursor: pointer;
+        }
+        #chatroomList .chatroom:hover{
+            background-color: rgb(124, 124, 124);
+            
+        }
+        #messagesSpace{
+            width: 500px;
+            background-color: rgb(233, 233, 233);
+            padding: 20px;
+            display: flex;
+            flex-direction: column-reverse;
+            overflow: auto;
+        }
+        #messagesSpace .message p{
+            margin: 0px;
+        }
+        #messagesSpace .message.sent{
+            background-color: rgb(80, 92, 255);
+            width: max-content;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+            justify-content: flex-start;
+            /* margin-right:auto ; */
+            margin-left: 80%;
+        }
+        #messagesSpace .message.recieved{
+            background-color: rgb(167, 167, 167);
+            width: max-content;
+            padding: 10px;
+            border-radius: 10px;
+            color: rgb(0, 0, 0);
+            justify-content: flex-start;
+            margin-right:auto ;
+        }
+        #chatarea{
+            display: flex;
+            flex-direction: column;
+            border: 1px solid black;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatroomList">
+        <h2>Chatrooms</h2>
+        <div id="list">
+            <div class="chatroom" onclick="openChatRoom(1)">
+                <h2>Dr/mohamed</h2>
+                <span class="id">1</span>
+            </div>
+            <div class="chatroom" onclick="openChatRoom(2)">
+                <h2>Dr/mohamed</h2>
+                <span class="id">2</span>
+            </div>
+            <div class="chatroom" onclick="openChatRoom(3)">
+                <h2>Dr/mohamed</h2>
+                <span class="id">3</span>
+            </div>
+        </div>
+        
+    </div>
+    <div id="chatarea">
+        <span>You Have To Be 'patient' or 'doctor'<br/></span>
+        <input type="text" placeholder="type your Role" id="roleInput">
+        <input type="number" placeholder="type your id" id="idInput">
+        <button id="Register">Register</button>
+        <br/>
+        <p>Your Id: <span id="currentID"></span></p>
+        <p>Current Chat ID: <span id="currentChatID"></span></p>
+
+        <button id="check">Check Online</button>
+        <br/>
+        <div id="messagesSpace">
+            <div class="message sent">
+                <p>hello</p>
+            </div>
+            <div class="message recieved">
+                <p>hello</p>
+            </div>
+        </div>
+        <p id="status"></p>
+        <ul id="messages"></ul>
+        <form id="form" action="">
+            <input id="m" autocomplete="off" />
+            <button>Send</button>
+        </form>
+    </div>
+
+    <script>
+        const socket = io('http://localhost:8000');
+        socket.on("update",(data)=>{
+            console.log("Updating")
+            socket.emit("get_messages",{chatroomID:1,"role":document.getElementById("roleInput").value.trim()})
+        })
+        // Register a User
+        document.getElementById("Register").addEventListener("click",(e)=>{
+            const role = document.getElementById("roleInput").value.trim()
+            const id = document.getElementById("idInput").value.trim()
+
+            console.log("Clicked for ",role,id)
+            socket.emit("go_online",{"userRole":role,"userID":id})
+            socket.emit("chatrooms",{"userID":id,"role":role})
+            document.getElementById("currentID").innerHTML = `${role}${id}`
+        })
+        
+        document.getElementById("check").addEventListener("click",()=>{
+            socket.emit("check_online",{
+                role:document.getElementById("roleInput").value.trim(),
+                id:document.getElementById("idInput").value.trim()
+            })
+        })
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const messageInput = document.getElementById('m');
+            const message = messageInput.value.trim();
+            const req = {
+                "chatroomID":1,
+                "senderRole":document.getElementById("roleInput").value.trim(),
+                "text":message
+            }
+            if (message !== '') {
+                socket.emit('send_message', req);
+                messageInput.value = '';
+            }
+        });
+
+        socket.on("chatrooms",(data)=>{
+            var elements = ''
+            for(var el of data){
+                elements +=`
+                <div class="chatroom" onclick="openChatRoom(${el.id})">
+                    <h2>${el.doctor.name}</h2>
+                    <span class = 'hide id'>${el.id}</span>
+                </div>
+                `
+            }
+            document.getElementById("list").innerHTML = elements
+        })
+
+        // Get all elements with class 'chatroom'
+        const chatroomDivs = document.querySelectorAll('.chatroom');
+
+        // Add click event listener to each div
+        function openChatRoom(id){
+                document.getElementById('currentChatID').innerHTML =id// this.querySelector('.id').innerHTML
+                // const id = this.querySelector('.id').innerHTML
+
+                socket.emit("get_messages",{chatroomID:id,role:document.getElementById("roleInput").value.trim()})
+          
+        };
+        socket.on('get_messages', function (msgList) {
+            console.log(msgList)
+            var elemnts= ''
+            for(var msg of msgList){
+                console.log('-----------')
+                console.log(msg.senderSide)
+                console.log(document.getElementById("roleInput"))
+                console.log('-----------')
+                elemnts +=
+                `
+                <div class="message ${msg.senderSide === document.getElementById("roleInput").value ? 'sent':'recieved'}">
+                    <p>${msg.text}</p>
+                </div>
+                `
+            }
+            document.getElementById("messagesSpace").innerHTML = elemnts
+
+        });
+
+        socket.on("check_online",(data)=>{
+            console.log(data)
+            document.getElementById("status").innerHTML = data? "online":"offline"
+        })
+    </script>
+</body>
+</html>

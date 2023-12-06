@@ -7,7 +7,9 @@ import communityRouter from './Server/community'
 import SupervisorRouter from './Server/supervisor'
 import NotificationRouter from './Server/Notifications'
 import AdminRouter from './Server/admin'
-
+import ChatRouter from './Server/Chat'
+import chatFunctions from './Server/DB_Functions/chatFunctions'
+const { InitializeChat } = require('./Server/ChatIO'); // Adjust the path as needed
 
 //Main Modules
 var cors = require('cors')
@@ -20,6 +22,11 @@ const path = require('path')
 const cookieParser = require('cookie-parser');
 const fileUpload = require('express-fileupload');
 var jwt = require('jsonwebtoken');
+
+// Chat Options
+var http = require('http');
+const server = http.createServer(app);
+InitializeChat(server)
 
 // Cors Access
 app.use(cors({
@@ -57,6 +64,9 @@ app.use("/notify",NotificationRouter)
 
 // Admin Features
 app.use("/admin",AdminRouter)
+
+// Chat Features
+app.use("/chat",ChatRouter)
 
 app.use("/styles.css", express.static(path.join(__dirname, "public/styles.css")));
 
@@ -173,7 +183,13 @@ app.get("/checkauth",Authenticate,async (req:any,res:any)=>{
     console.log('User Agent:', userAgent);
 
     res.status(200).json("authorized")
-
     
 })
-export default app
+
+
+//                                             Chat Socket Functions Section
+//--------------------------------------------------------------------------------------------------------------------------  
+
+InitializeChat(server)
+
+export default server
