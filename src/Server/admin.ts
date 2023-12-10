@@ -61,4 +61,10 @@ router.delete("/remove-supervisor", getCorsAccess, async (req, res) => {
     res.status(response['status']).json(response['data']);
 });
 
+// Add New Community Category
+router.post("/new-community", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.addNewCommunity(req.body);
+    res.status(response['status']).json(response['data']);
+});
+
 export default router

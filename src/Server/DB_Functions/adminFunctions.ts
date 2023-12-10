@@ -1,23 +1,12 @@
 import { Database } from "../../data-source";
 import { Article } from "../../entity/Blog/Article";
-import { ArticleComment } from "../../entity/Blog/ArticleComment";
-import { ArticleCommentsLike } from "../../entity/Blog/ArticleCommentLikes";
-import { ArticleDoctorVotes } from "../../entity/Blog/ArticleDoctorVotes";
-import { ArticleImages } from "../../entity/Blog/ArticleImages";
-import { ArticleSeen } from "../../entity/Blog/ArticleSeen";
-import { ArticleVotes } from "../../entity/Blog/ArticleVotes";
-import { Categories } from "../../entity/Blog/Categories";
-import { CategorySuggester } from "../../entity/Blog/CategorySuggester";
-import { SavedArticle } from "../../entity/Blog/SavedArticle";
+import { Community } from "../../entity/community/Community";
 import { Post } from "../../entity/community/Post";
 import { PostReaction } from "../../entity/community/PostReaction";
 import { LoginRouter } from "../../entity/login/LoginRouter";
-import { Doctor } from "../../entity/users/Doctor";
-import { Patient } from "../../entity/users/Patient";
 import { Supervisor } from "../../entity/users/Supervisor";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import responseGenerater from "../../middleFunctions/responseGenerator";
-import NotificationFunctions from "./NotificationFunctions";
 
 
 class AdminFunctions{
@@ -147,6 +136,29 @@ class AdminFunctions{
             console.log("Error!!\n", err);
             return responseGenerater.Error;
         }
+    }
+
+    // Add New Community
+    async addNewCommunity(reqData){
+        // Check Parameter Existence
+        const checkParam  = checkUndefined(reqData,['name','description'])
+        if (checkParam){
+            responseGenerater.sendMissingParam(checkParam)
+        }
+        try{
+            //  Create New Community
+            const NewCommunity        = new Community()
+            NewCommunity.name         = reqData['name'] 
+            NewCommunity.description  = reqData['description'] 
+            NewCommunity.approved     = true
+            await Database.getRepository(Community).save(NewCommunity)
+            
+            return responseGenerater.done
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
+
     }
 }
 
