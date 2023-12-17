@@ -1,5 +1,6 @@
 import { Database } from "../../data-source";
 import { Article } from "../../entity/Blog/Article";
+import { ChatPlans } from "../../entity/chat/ChatPlans";
 import { Community } from "../../entity/community/Community";
 import { Post } from "../../entity/community/Post";
 import { PostReaction } from "../../entity/community/PostReaction";
@@ -159,6 +160,28 @@ class AdminFunctions{
             return responseGenerater.Error;
         }
 
+    }
+
+    // Add New Chat Plan
+    async addNewChatPlan(reqData){
+        // Check Parameter Existence
+        const checkParam  = checkUndefined(reqData,['price','currency',"amount"])
+        if (checkParam){
+            responseGenerater.sendMissingParam(checkParam)
+        }
+        try{
+            //  Create New Chat Plan
+            const NewChatPlan      = new ChatPlans()
+            NewChatPlan.price      = reqData['price'] 
+            NewChatPlan.currency   = reqData['currency'] 
+            NewChatPlan.amount     = reqData['amount']
+            await Database.getRepository(ChatPlans).save(NewChatPlan)
+            
+            return responseGenerater.done
+        } catch (err) {
+            console.log("Error!!\n", err);
+            return responseGenerater.Error;
+        }
     }
 }
 

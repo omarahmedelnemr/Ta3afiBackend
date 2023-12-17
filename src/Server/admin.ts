@@ -67,4 +67,10 @@ router.post("/new-community", getCorsAccess, async (req, res) => {
     res.status(response['status']).json(response['data']);
 });
 
+// Add New Chat Plan
+router.post("/new-chat_plan", getCorsAccess, async (req, res) => {
+    const response = await adminFunctions.addNewChatPlan(req.body);
+    res.status(response['status']).json(response['data']);
+});
+
 export default router

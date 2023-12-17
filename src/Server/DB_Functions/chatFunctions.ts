@@ -1,5 +1,6 @@
 import { Database } from "../../data-source";
 import { ChatMessages } from "../../entity/chat/ChatMessage";
+import { ChatPlans } from "../../entity/chat/ChatPlans";
 import { Chatroom } from "../../entity/chat/Chatroom";
 import { Doctor } from "../../entity/users/Doctor";
 import { Patient } from "../../entity/users/Patient";
@@ -52,6 +53,7 @@ class ChatFunctions{
                 .innerJoin("Chatroom.patient","patient")
                 .innerJoinAndSelect("Chatroom.doctor","doctor")
                 .where("patient.id = :userID",{userID:reqData["userID"]})
+                .orderBy("Chatroom.last_update",'DESC')
                 .getMany()
             }else if (reqData['role'] === 'doctor'){
                 chatroomList =  await Database.getRepository(Chatroom)
@@ -59,6 +61,7 @@ class ChatFunctions{
                 .innerJoin("Chatroom.doctor","doctor")
                 .innerJoinAndSelect("Chatroom.patient","patient")
                 .where("doctor.id = :userID",{userID:reqData["userID"]})
+                .orderBy("Chatroom.last_update",'DESC')
                 .getMany()
             }
 
@@ -113,7 +116,12 @@ class ChatFunctions{
             }
 
             // Get All Messages
-            const messages  = await Database.getRepository(ChatMessages).findBy({chatroom:{id:reqData["chatroomID"]}})
+            const messages  = await Database.getRepository(ChatMessages)
+            .createQueryBuilder("ChatMessages")
+            .innerJoin("ChatMessages.chatroom","chatroom")
+            .where("chatroom.id = chatroomID",{chatroomID:reqData["chatroomID"]})
+            .orderBy("ChatMessages.sendDate",'DESC')
+            .getMany()
 
             // Mark All The Messages on The Chatroom with other Role to be Seen 
             this.MarkAsSeen(reqData)
@@ -133,15 +141,33 @@ class ChatFunctions{
             return responseGenerator.sendMissingParam(checkParam)
         }
         try{
+            const chatroom = await Database.getRepository(Chatroom).findOneBy({id:reqData['chatroomID']})
+
+            // Check if the Patient Exceeds The Messages Quota
+            if (reqData['senderRole'] === 'patient' && chatroom.quota <= 0){
+                return responseGenerator.sendError("You Have Exceeded You Available Quota")
+            }
+            
             // Create New Message
             const newMessage = new ChatMessages()
-            newMessage.chatroom   = await Database.getRepository(Chatroom).findOneBy({id:reqData['chatroomID']})
+            newMessage.chatroom   = chatroom
             newMessage.sendDate   = new Date()
             newMessage.senderSide = reqData['senderRole']
             newMessage.text       = reqData['text']
 
             await Database.getRepository(ChatMessages).save(newMessage)
             
+            // update Chatroom last Message and Update
+            chatroom.last_update  = newMessage.sendDate
+            if (reqData['senderRole'] === 'doctor'){
+                chatroom.last_d_message = newMessage.text.length > 30 ? newMessage.text.substring(0, 30) : newMessage.text;
+            }else{
+                // Decrease The Qutoa and Update the Last Text
+                chatroom.quota -=1;
+                chatroom.last_p_message = newMessage.text.length > 30 ? newMessage.text.substring(0, 30) : newMessage.text;
+
+            }
+            await Database.getRepository(Chatroom).save(chatroom)
             
             return responseGenerator.done
         }catch(err){
@@ -150,8 +176,73 @@ class ChatFunctions{
         }
     }
 
-    // Get Message Count
+    // Get un-read Message Count For Each ChatRoom
+    async GetMessagesCount(reqData){
+            // Check Parameter Existence
+            const checkParam = checkUndefined(reqData,["chatroomID","role"])
+            if (checkParam){
+                return responseGenerator.sendMissingParam(checkParam)
+            }
+            try{
+                // Check For Cahtroom 
+                const check = await Database.getRepository(Chatroom).findOneBy({id:reqData['chatroomID']})
+                if (check === null){
+                    return responseGenerator.notFound
+                }
+    
+                // Get Messages Count
+                const messagesCount  = await Database.getRepository(ChatMessages)
+                .createQueryBuilder("ChatMessages")
+                .innerJoin("ChatMessages.chatroom","chatroom")
+                .where("chatroom.id = chatroomID",{chatroomID:reqData["chatroomID"]})
+                .andWhere("ChatMessages.seen = false")
+                .getCount()
+    
+                return responseGenerator.sendData(messagesCount)
+    
+            }catch(err){
+                console.log("Error!!\n",err)
+                return responseGenerator.Error
+            }
+    }
 
+    // Update the Chatroom Quota
+    async RegisterInChatPlan(reqData){
+        // Check Parameter Existence
+        const checkParam = checkUndefined(reqData,['chatroomID','newQuota'])
+        if (checkParam){
+            return responseGenerator.sendMissingParam(checkParam)
+        }
+        try{
+            // Get Chatroom Info
+            const chatroom = await Database.getRepository(Chatroom).findOneBy({id:reqData['chatroomID']})
+            if (chatroom === null){
+                return responseGenerator.notFound
+            }
+
+            // update Chatroom Info
+            chatroom.quota = reqData['newQuota']
+
+            // save to DB
+            await Database.getRepository(Chatroom).save(chatroom)
+
+            return responseGenerator.done
+        }catch(err){
+            console.log("Error!\n",err)
+            return responseGenerator.Error
+        }
+    }
+
+    // Get all Chat Plans
+    async GetAllChatPlans(reqData){
+        try{
+            const plans = await Database.getRepository(ChatPlans).find()
+            return responseGenerator.sendData(plans)
+        }catch(err){
+            console.log("Error!\n",err)
+            return responseGenerator.Error
+        }
+    }
 }
 
 export default new ChatFunctions();
