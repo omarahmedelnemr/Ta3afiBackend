@@ -9,8 +9,42 @@ import { Supervisor } from "../../entity/users/Supervisor";
 import checkUndefined from "../../middleFunctions/checkUndefined";
 import responseGenerater from "../../middleFunctions/responseGenerator";
 
+var jwt = require('jsonwebtoken');
 
 class AdminFunctions{
+
+    // Login Function For Admins
+    async adminLogin(reqData){
+        // Check Parameter Existence
+        const checkParams = checkUndefined(reqData,['email',"password"])
+        if (checkParams){
+            return responseGenerater.sendMissingParam(checkParams)
+        }
+
+        // Read the Parameters
+        const email    = reqData['email']
+        const password = reqData['password']
+        try{
+            if (email !== process.env.ADMIN_EMAIL){
+                return responseGenerater.sendError("Wrong Email or Password")
+            }
+            else if(password !== process.env.ADMIN_PASSWORD){
+                return responseGenerater.sendError("Wrong Email or Password")
+            }
+            else{
+                const JWTInfo = {
+                    "email":email
+                }
+                //Generat JWT That Last For 2 Days, But Check Supervision Auth
+                var genratedJWT = jwt.sign( JWTInfo,process.env.ADMIN_SECRET,{ expiresIn: 60 * 60 *24*2 });
+                return responseGenerater.sendData({'token':genratedJWT})
+    
+            }
+        }catch(err){
+            console.log("Error!\n",err)
+            return responseGenerater.Error
+        }
+    }
 
     // Get General Data Like Doctors Number, Patients number, Posts Number, interaction and Reactions Number, articale NUmber ad More
     async getGeneralData(reqData){

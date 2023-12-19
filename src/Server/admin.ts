@@ -5,6 +5,7 @@ import adminFunctions from './DB_Functions/adminFunctions'
 
 //Main Modules
 import { Router } from 'express'
+import { AdminAuthenticate } from '../Middleware/adminAuth'
 const router = Router()
 const express = require('express');
 
@@ -14,10 +15,22 @@ router.use("/styles.css", express.static(path.join(__dirname, "../public/styles.
 //-------------------------------------------------------------------------------------------
 //------------------------------------- General ---------------------------------------------
 //-------------------------------------------------------------------------------------------
+
+// Login Endpoint for Admins
+router.post("/adminLogin", async (req, res) => {
+    const response = await adminFunctions.adminLogin(req.body)
+    res.status(response['status']).json(response['data'])
+});
+
+// Check Weather the Page Is Accessed From the Admin or Not Using The JWT Token
+router.post("/checkAuth", AdminAuthenticate, async (req, res) => {
+    res.status(200).json('authorized')
+});
+
 router.get("/dashboard", (req, res) => {
     res.sendFile(path.join(__dirname, "../public/dashboard.html"));
-    // res.sendFile(path.join(__dirname, "./public/login/index.html"));
   });
+
 
 // Get a General Info
 router.get("/general", getCorsAccess, async (req,res)=>{
