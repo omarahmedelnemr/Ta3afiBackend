@@ -12,7 +12,7 @@ export const Database = new DataSource({
     database: process.env.DATABASE,
     synchronize: Boolean(Number(process.env.SYNCHRONIZE)),
     logging: Boolean(Number(process.env.LOGGING)),//Boolean(process.env.LOGGING),
-    entities: [ __dirname + "/entity/*.ts" ,__dirname + "/entity/**/*.ts"],
+    entities: [ __dirname + "/Server/**/Tables/*.ts",,__dirname + "/Server/**/Tables/**/*.ts"],
     migrations: [],
     subscribers: [],
 })

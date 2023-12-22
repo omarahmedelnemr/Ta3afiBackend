@@ -1,15 +1,14 @@
 import { getCorsAccess } from './Middleware/cors'
 import { Authenticate } from './Middleware/Auth'
-import AuthRouter from "./Server/Login" 
-import profileRouter from './Server/profileEdits'
-import blogRouter from './Server/blog'
-import communityRouter from './Server/community'
-import SupervisorRouter from './Server/supervisor'
-import NotificationRouter from './Server/Notifications'
-import AdminRouter from './Server/admin'
-import ChatRouter from './Server/Chat'
-import chatFunctions from './Server/DB_Functions/chatFunctions'
-const { InitializeChat } = require('./Server/ChatIO'); // Adjust the path as needed
+import AuthRouter from "./Server/Login/Login" 
+import profileRouter from './Server/User Info/profileEdits'
+import blogRouter from './Server/Blog/blog'
+import communityRouter from './Server/Community/community'
+import SupervisorRouter from './Server/Supervisors/supervisor'
+import NotificationRouter from './Server/User Info/Notifications'
+import AdminRouter from './Server/Admin/admin'
+import ChatRouter from './Server/Chat/Chat'
+const { InitializeChat } = require('./Server/Chat/ChatIO'); // Adjust the path as needed
 
 //Main Modules
 var cors = require('cors')
