@@ -10,6 +10,9 @@ export class Community{
     @Column()
     name: string
 
+    @Column({default:"http://image/icon.png"})
+    iconLink:string
+
     @Column({comment:"Quick Description of what is this Community Talk About in Brief"})
     description:string
 

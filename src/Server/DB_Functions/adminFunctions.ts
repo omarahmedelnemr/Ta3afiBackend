@@ -176,7 +176,7 @@ class AdminFunctions{
     // Add New Community
     async addNewCommunity(reqData){
         // Check Parameter Existence
-        const checkParam  = checkUndefined(reqData,['name','description'])
+        const checkParam  = checkUndefined(reqData,['name','description',"iconLink"])
         if (checkParam){
             responseGenerater.sendMissingParam(checkParam)
         }
@@ -185,6 +185,7 @@ class AdminFunctions{
             const NewCommunity        = new Community()
             NewCommunity.name         = reqData['name'] 
             NewCommunity.description  = reqData['description'] 
+            NewCommunity.iconLink  = reqData['iconLink'] 
             NewCommunity.approved     = true
             await Database.getRepository(Community).save(NewCommunity)
             
