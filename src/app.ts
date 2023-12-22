@@ -67,6 +67,9 @@ app.use("/admin",AdminRouter)
 // Chat Features
 app.use("/chat",ChatRouter)
 
+// Appointment Features
+app.use("/appointment",ChatRouter)
+
 app.use("/styles.css", express.static(path.join(__dirname, "public/styles.css")));
 
 // Base endpoint to Test That API is Working
