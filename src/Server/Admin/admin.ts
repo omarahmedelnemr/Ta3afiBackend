@@ -1,11 +1,8 @@
-// Middle Functions
 import { getCorsAccess } from '../../Middleware/cors'
-import { Authenticate } from '../../Middleware/Auth'
 import adminFunctions from './Functions/adminFunctions'
-
-//Main Modules
-import { Router } from 'express'
 import { AdminAuthenticate } from '../../Middleware/adminAuth'
+import { Router } from 'express'
+
 const router = Router()
 const express = require('express');
 
