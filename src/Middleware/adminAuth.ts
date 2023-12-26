@@ -7,6 +7,8 @@ export async function AdminAuthenticate(req,res,next){
     // Commented For Testing
     const token = req.headers['authorization']
     try{
+
+        // Verify With Admin Secret
         const jwtData = await jwt.verify(token,process.env.ADMIN_SECRET)
 
     }catch{
