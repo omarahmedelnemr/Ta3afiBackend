@@ -8,6 +8,7 @@ import SupervisorRouter from './Server/Supervisors/supervisor'
 import NotificationRouter from './Server/User Info/Notifications'
 import AdminRouter from './Server/Admin/admin'
 import ChatRouter from './Server/Chat/Chat'
+import AppointmentRouter from './Server/Appointments/Appointments'
 const { InitializeChat } = require('./Server/Chat/ChatIO'); // Adjust the path as needed
 
 //Main Modules
@@ -68,7 +69,7 @@ app.use("/admin",AdminRouter)
 app.use("/chat",ChatRouter)
 
 // Appointment Features
-app.use("/appointment",ChatRouter)
+app.use("/appointment",AppointmentRouter)
 
 app.use("/styles.css", express.static(path.join(__dirname, "public/styles.css")));
 
