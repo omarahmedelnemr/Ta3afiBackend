@@ -124,6 +124,9 @@ class CommunityFunctions{
             return responseGenerater.sendMissingParam(checkParams)
         }
         try{
+            if (reqData['loadBlock']<=0){
+                return responseGenerater.sendError("Invalide Load Block Value")
+            }
             const allPosts = await Database.getRepository(Post)
             .createQueryBuilder("Post")
             .innerJoinAndSelect("Post.patient","patient")
