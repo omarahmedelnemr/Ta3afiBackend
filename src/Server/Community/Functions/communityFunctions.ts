@@ -128,8 +128,7 @@ class CommunityFunctions{
             .createQueryBuilder("Post")
             .innerJoinAndSelect("Post.patient","patient")
             .innerJoinAndSelect("Post.community","community")
-            .where("community.id = :communityID" ,{communityID:reqData['communityID']})
-            .andWhere("Post.approved = true")
+            .where("Post.approved = true")
             .andWhere("Post.deleted = false")
             .andWhere("Post.mainText like :searchText",{searchText:"%"+reqData['searchText']+"%"})
             .select([
