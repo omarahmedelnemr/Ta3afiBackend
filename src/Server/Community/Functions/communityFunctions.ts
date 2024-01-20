@@ -125,7 +125,7 @@ class CommunityFunctions{
         }
         try{
             if (reqData['loadBlock']<=0){
-                return responseGenerater.sendError("Invalide Load Block Value")
+                return responseGenerater.sendError("Invalid Load Block Value")
             }
             const allPosts = await Database.getRepository(Post)
             .createQueryBuilder("Post")
