@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, Unique, OneToMany } from "typeorm"
+import { DoctorTag } from "../DoctorInfo/Tags"
 
 @Entity()
 @Unique(['id'])
@@ -34,5 +35,9 @@ export class Doctor{
     starRate:number
 
     @Column({default:0,comment:"The Number of Sessions That This Doctor Made, increases Every New Session"})
-    sessionsNumber:number
+    completedSessions:number
+
+    @Column({default:0,comment:"The Number of Sessions That Active For The Doctr and Not Yet Done"})
+    pendingSessions:number
+
 }
