@@ -3,27 +3,34 @@ import Chat from './Functions/chatFunctions'
 // For SocketIO
 const socketIO = require("socket.io")
 
-function InitializeChat(server){
+function InitializeChat(io){
 
-    const io = socketIO(server,{cors:{origin:true}});
     io.on('connection',async (socket:any) => {
-        console.log('A user is connected');
-
-        // Make the User Go Online
-        socket.on('go_online', (data) => {
-            const userName = `${data["userRole"]}${data['userID']}`
+        try{
+            const role =  socket.handshake.query.userRole
+            const id =  socket.handshake.query.userID
+            if (role === undefined || id === undefined){
+                console.log("Missing Param")
+                socket.disconnect();
+                return;
+            }
+            const userName = `${role}${id}`
             console.log(`user ${userName} Connected`)
             socket.join(userName)
             socket["onlineHandle"] = userName
-            console.log(io.sockets.adapter.rooms)
-        });
+        }catch{
+            return;
+        }
 
         // Get All Chatrooms
         socket.on("chatrooms",async (data)=>{
+            console.log("Data Recieved: ",data)
             const response = await Chat.GetAlChatrooms(data)
             if (response.status !== 200){
+                console.log("Error")
                 socket.emit("error","Message is Not Sent")
             }else{
+                console.log("response: ",response)
                 socket.emit("chatrooms",response.data)
             }
         })
@@ -51,14 +58,16 @@ function InitializeChat(server){
             const response =await  Chat.SendNewMessage(data)
             console.log("Socket on: sendMessage")
             if (response.status !== 200){
+                console.log(response)
                 socket.emit("error","Message is Not Sent")
             }else{
 
                 var otherID;
+                const chatroomInfo  =  response['data']
                 if (data['senderRole'] === 'patient'){
-                    otherID = 'doctor3'
+                    otherID = 'doctor'+chatroomInfo.doctor.id
                 }else{
-                    otherID = 'patient2'
+                    otherID = 'patient' + chatroomInfo.patient.id
                 }
 
                 io.to(otherID).emit('update', "Done")

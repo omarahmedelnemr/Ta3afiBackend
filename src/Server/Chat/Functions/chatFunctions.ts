@@ -119,7 +119,7 @@ class ChatFunctions{
             const messages  = await Database.getRepository(ChatMessages)
             .createQueryBuilder("ChatMessages")
             .innerJoin("ChatMessages.chatroom","chatroom")
-            .where("chatroom.id = chatroomID",{chatroomID:reqData["chatroomID"]})
+            .where("chatroom.id = :chatroomID",{chatroomID:reqData["chatroomID"]})
             .orderBy("ChatMessages.sendDate",'DESC')
             .getMany()
 
@@ -141,7 +141,12 @@ class ChatFunctions{
             return responseGenerator.sendMissingParam(checkParam)
         }
         try{
-            const chatroom = await Database.getRepository(Chatroom).findOneBy({id:reqData['chatroomID']})
+            const chatroom = await Database.getRepository(Chatroom)
+            .createQueryBuilder("chatroom")
+            .innerJoinAndSelect("chatroom.doctor", "doctor")
+            .innerJoinAndSelect("chatroom.patient", "patient")
+            .where("chatroom.id = :chatroomID", { chatroomID: reqData['chatroomID'] })
+            .getOne();
 
             // Check if the Patient Exceeds The Messages Quota
             if (reqData['senderRole'] === 'patient' && chatroom.quota <= 0){
@@ -169,7 +174,7 @@ class ChatFunctions{
             }
             await Database.getRepository(Chatroom).save(chatroom)
             
-            return responseGenerator.done
+            return responseGenerator.sendData(chatroom)
         }catch(err){
             console.log("Error!!\n",err)
             return responseGenerator.Error
