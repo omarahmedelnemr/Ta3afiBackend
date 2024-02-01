@@ -10,12 +10,12 @@ import AdminRouter from './Server/Admin/admin'
 import ChatRouter from './Server/Chat/Chat'
 import AppointmentRouter from './Server/Appointments/Appointments'
 const { InitializeChat } = require('./Server/Chat/ChatIO'); // Adjust the path as needed
-
+const { InitializeNotify }   = require("./Server/User Info/NotificationsIO")
 //Main Modules
 var cors = require('cors')
 const express = require('express');
 const app = express()
-
+const socketIO = require("socket.io")
 
 //un used 'yet' Modules
 const path = require('path')
@@ -26,7 +26,11 @@ var jwt = require('jsonwebtoken');
 // Chat Options
 var http = require('http');
 const server = http.createServer(app);
-InitializeChat(server)
+const io = socketIO(server,{cors:{origin:true}});
+
+
+InitializeChat(io)
+InitializeNotify(io)
 
 // Cors Access
 app.use(cors({
