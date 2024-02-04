@@ -17,6 +17,29 @@ class CommunityFunctions{
     //-------------------------------------------------------------------------------------------
     //--------------------------------- General Post Viewing ------------------------------------
     //-------------------------------------------------------------------------------------------
+    async getCommonQueryBuilder  (loadBlock){
+        return Database.getRepository(Post)
+          .createQueryBuilder("Post")
+          .innerJoinAndSelect("Post.patient", "patient")
+          .innerJoinAndSelect("Post.community", "community")
+          .andWhere("Post.approved = true")
+          .andWhere("Post.deleted = false")
+          .select([
+            "Post.id as id",
+            "Post.date as date",
+            "Post.views as views",
+            "Post.edited as edited",
+            "Post.mainText as mainText",
+            "Post.hideIdentity as hideIdentity",
+            "community.name as community",
+            "patient.id as patientID",
+            "patient.name as userName",
+            "patient.profileImage as userProfileImage",
+          ])
+          .orderBy('Post.date', 'DESC')
+          .limit(15)
+          .offset(15 * (Number(loadBlock) - 1));
+      };
 
     // Get All Approved Communities List
     async GetCommunitiesList(reqData){
@@ -43,52 +66,16 @@ class CommunityFunctions{
 
             // Getting all PostS Without Community Classification
             if (reqData["communityID"] === undefined ){
-                allPosts = await Database.getRepository(Post)
-                .createQueryBuilder("Post")
-                .innerJoinAndSelect("Post.patient","patient")
-                .innerJoinAndSelect("Post.community","community")
-                .andWhere("Post.approved = true")
-                .andWhere("Post.deleted = false")
-                .select([
-                    "Post.id as id",
-                    "Post.date as date",
-                    "Post.views as views",
-                    "Post.edited as edited",
-                    "Post.mainText as mainText",
-                    "Post.hideIdentity as hideIdentity",
-                    "community.name as community",
-                    "patient.name as userName",
-                    "patient.profileImage as userProfileImage",
-                ])
-                .orderBy('Post.date', 'DESC')
-                .limit(15)
-                .offset(15* (Number(reqData['loadBlock'])-1))
-                .getRawMany()
+                allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
+                .getRawMany();
             }
 
             // Getting a specific Community Posts
             else{
-                allPosts = await Database.getRepository(Post)
-                .createQueryBuilder("Post")
-                .innerJoinAndSelect("Post.patient","patient")
-                .innerJoinAndSelect("Post.community","community")
-                .where("community.id = :communityID" ,{communityID:reqData['communityID']})
-                .andWhere("Post.approved = true")
-                .andWhere("Post.deleted = false")
-                .select([
-                    "Post.id as id",
-                    "Post.date as date",
-                    "Post.views as views",
-                    "Post.edited as edited",
-                    "Post.mainText as mainText",
-                    "Post.hideIdentity as hideIdentity",
-                    "community.name as community",
-                    "patient.name as userName",
-                    "patient.profileImage as userProfileImage",
-                ])
-                .limit(15)
-                .offset(15* (Number(reqData['loadBlock'])-1))
-                .getRawMany()
+                allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
+                .where("community.id = :communityID", { communityID: reqData['communityID'] })
+                .getRawMany();
+                console.log(allPosts)
             }
 
             // adding Reactions Number
@@ -127,28 +114,9 @@ class CommunityFunctions{
             if (reqData['loadBlock']<=0){
                 return responseGenerater.sendError("Invalid Load Block Value")
             }
-            const allPosts = await Database.getRepository(Post)
-            .createQueryBuilder("Post")
-            .innerJoinAndSelect("Post.patient","patient")
-            .innerJoinAndSelect("Post.community","community")
-            .where("Post.approved = true")
-            .andWhere("Post.deleted = false")
-            .andWhere("Post.mainText like :searchText",{searchText:"%"+reqData['searchText']+"%"})
-            .select([
-                "Post.id as id",
-                "Post.date as date",
-                "Post.views as views",
-                "Post.edited as edited",
-                "Post.mainText as mainText",
-                "Post.hideIdentity as hideIdentity",
-                "community.name as community",
-                "patient.name as userName",
-                "patient.profileImage as userProfileImage",
-            ])
-            .orderBy('Post.date', 'DESC')
-            .limit(15)
-            .offset(15* (Number(reqData['loadBlock'])-1))
-            .getRawMany()
+            const allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
+            .andWhere("Post.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
+            .getRawMany();
 
             // adding Reactions Number
             for (var i=0;i<allPosts.length;i++){
@@ -185,27 +153,10 @@ class CommunityFunctions{
         }
         try{
             // Getting All Posts Related to a User
-            const allPosts = await Database.getRepository(Post)
-            .createQueryBuilder("Post")
-            .innerJoinAndSelect("Post.patient","patient")
-            .innerJoinAndSelect("Post.community","community")
-            .where("Post.patient.id = :patientID" ,{patientID:reqData['patientID']})
-            .select([
-                "Post.id as id",
-                "Post.date as date",
-                "Post.views as views",
-                "Post.edited as edited",
-                "Post.mainText as mainText",
-                "Post.hideIdentity as hideIdentity",
-                "Post.approved as approved",
-                "Post.deleted as deleted",
-                "community.name as community",
-                "patient.name as userName",
-                "patient.profileImage as userProfileImage",
-            ])
-            .limit(15)
-            .offset(15* (Number(reqData['loadBlock'])-1))
-            .getRawMany()
+            const allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
+            .where("Post.patient.id = :patientID", { patientID: reqData['patientID'] })
+            .getRawMany();
+
 
             // adding Reactions Number
             for (var i=0;i<allPosts.length;i++){
@@ -730,6 +681,7 @@ class CommunityFunctions{
                     "Post.mainText as mainText",
                     "Post.hideIdentity as hideIdentity",
                     "community.name as community",
+                    "patient.id as patientID",
                     "patient.name as userName",
                     "patient.profileImage as userProfileImage",
                 ])
