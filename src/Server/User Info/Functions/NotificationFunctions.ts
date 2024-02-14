@@ -48,7 +48,7 @@ class Notification{ //Add The Count
               if (LatestNotification === null){
                 const newNotification    = new PatientNotification()
                 newNotification.date     = new Date()
-                newNotification.category = dictionary[category.toLowerCase()] !== undefined ? dictionary[category.toLowerCase()][patient.language]:category    // Used to Translate all Notification Categories to User Lang
+                newNotification.category = category //dictionary[category.toLowerCase()] !== undefined ? dictionary[category.toLowerCase()][patient.language]:category    // Used to Translate all Notification Categories to User Lang
                 newNotification.header   = dictionary[header.toLowerCase()] !== undefined ? dictionary[header.toLowerCase()][patient.language]: header   // Used to Translate all Notification Categories to User Lang
                 newNotification.text     = text
                 newNotification.patient  = patient
