@@ -88,10 +88,7 @@ class CommunityFunctions{
                 allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
                 .createQueryBuilder('PostReaction')
                 .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
-                .groupBy("PostReaction.reaction")
-                .select(['PostReaction.reaction as reaction'])
-                .addSelect("COUNT(*)",'count')
-                .getRawMany()
+                .getCount()
 
                 // Increase Post View in Normal Mode, Not in Admin or Dev Modes
                 if(reqData['effect']!=='0'){
@@ -134,10 +131,7 @@ class CommunityFunctions{
                 allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
                 .createQueryBuilder('PostReaction')
                 .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
-                .groupBy("PostReaction.reaction")
-                .select(['PostReaction.reaction as reaction'])
-                .addSelect("COUNT(*)",'count')
-                .getRawMany()
+                .getCount()
 
                 // Remove Identitity if hideIdentity
                 if (allPosts[i]['hideIdentity'] === 1){
@@ -174,10 +168,7 @@ class CommunityFunctions{
                 allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
                 .createQueryBuilder('PostReaction')
                 .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
-                .groupBy("PostReaction.reaction")
-                .select(['PostReaction.reaction as reaction'])
-                .addSelect("COUNT(*)",'count')
-                .getRawMany()
+                .getCount()
 
                 // Remove Identitity if hideIdentity
                 if (allPosts[i]['hideIdentity'] === 1){
@@ -373,7 +364,7 @@ class CommunityFunctions{
     // Patient React on a Post
     async ReactOnPost(reqData){
         // Check Parameter Existence
-        const checkParams = checkUndefined(reqData,["patientID","postID","reaction"])
+        const checkParams = checkUndefined(reqData,["patientID","postID"])
         if (checkParams){
             return responseGenerater.sendMissingParam(checkParams)
         }
@@ -381,7 +372,7 @@ class CommunityFunctions{
             const newReaction    = new PostReaction()
             newReaction.patient  = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newReaction.post     = await Database.getRepository(Post).findOneBy({id:reqData['postID']})
-            newReaction.reaction = reqData['reaction'].toLowerCase()
+            // newReaction.reaction = reqData['reaction'].toLowerCase()
 
             // Check if Data Was Wrong
             if (newReaction.patient === null || newReaction.post === null){
@@ -419,7 +410,7 @@ class CommunityFunctions{
 
             // Check if Data Was Missing
             if (newReaction === null){
-                return responseGenerater.missingParam
+                return responseGenerater.notFound
             }
 
 
@@ -428,6 +419,7 @@ class CommunityFunctions{
             .createQueryBuilder('PostReaction')
             .delete()
             .from(PostReaction)
+
             .where("post.id = :postID", { postID: reqData['postID'] })
             .andWhere("patient.id = :patientID", { patientID: reqData['patientID'] })
             .execute()
@@ -464,15 +456,12 @@ class CommunityFunctions{
             .offset(2* (Number(reqData['loadBlock'])-1))
             .getRawMany()
 
-            // Reactions Feature (Paused For )
+            // Reactions Feature 
             for (var i=0;i< commmentList.length;i++){
                 commmentList[i]['reactions'] = await Database.getRepository(PostCommentsReaction)
                 .createQueryBuilder('comment')
                 .where("comment.id = :commentID",{commentID:commmentList[i].id})
-                .groupBy("comment.reaction")
-                .select(['comment.reaction as reaction'])
-                .addSelect("COUNT(*)",'count')
-                .getRawMany()
+                .getCount()
                 
             }
 
@@ -575,7 +564,7 @@ class CommunityFunctions{
     // Pateint can Add Reactions to a comment
     async ReactOnComment(reqData){
         // Check Parameter Existence
-        const checkParams = checkUndefined(reqData,['patientID','commentID',"reaction"])
+        const checkParams = checkUndefined(reqData,['patientID','commentID'])
         if (checkParams){
             return responseGenerater.sendMissingParam(checkParams)
         }
@@ -601,7 +590,7 @@ class CommunityFunctions{
 
             // Creating New Entity
             const newLike    = new PostCommentsReaction()
-            newLike.reaction = reqData['reaction'].toLowerCase()
+            // newLike.reaction = reqData['reaction'].toLowerCase()
             newLike.comment  = await Database.getRepository(PostComment).findOneBy({id:reqData['commentID']})
             newLike.patient  = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newLike.post     = post.post

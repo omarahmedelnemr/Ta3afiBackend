@@ -10,8 +10,8 @@ export class PostCommentsReaction{
     @PrimaryGeneratedColumn()
     id:string
 
-    @Column()
-    reaction:string
+    // @Column()
+    // reaction:string
 
     @ManyToOne(()=>PostComment,commentID=>commentID.id)
     @JoinColumn()

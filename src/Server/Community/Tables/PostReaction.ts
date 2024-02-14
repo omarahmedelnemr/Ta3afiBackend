@@ -9,8 +9,8 @@ export class PostReaction{
     @PrimaryGeneratedColumn()
     id:string
 
-    @Column()
-    reaction:string
+    // @Column()
+    // reaction:string
 
     @ManyToOne(()=>Post,postID=>postID.id)
     @JoinColumn()
