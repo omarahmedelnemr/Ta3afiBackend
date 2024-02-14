@@ -56,27 +56,30 @@ class CommunityFunctions{
 
     // Get all Posts With a Category or Not
     async GetPostsFeed(reqData){
+
         // Check Parameter Existence
         const checkParams = checkUndefined(reqData,['loadBlock'])
         if (checkParams){
             return responseGenerater.sendMissingParam(checkParams)
         }
         try{
+            var baseRepo = await this.getCommonQueryBuilder(reqData['loadBlock']);
             var allPosts;
-
-            // Getting all PostS Without Community Classification
-            if (reqData["communityID"] === undefined ){
-                allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
-                .getRawMany();
-            }
-
+            ////  Filtering Posts
             // Getting a specific Community Posts
-            else{
-                allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
-                .where("community.id = :communityID", { communityID: reqData['communityID'] })
-                .getRawMany();
-                console.log(allPosts)
+            if (reqData["communityID"] !== undefined ){
+                baseRepo = baseRepo
+                .andWhere("community.id = :communityID", { communityID: reqData['communityID'] })
+                
             }
+            // Getting Posts With a specific Text in them
+            if (reqData["searchText"] !== undefined ){
+                baseRepo = baseRepo
+                .andWhere("Post.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
+            }
+            allPosts = await baseRepo.getRawMany()
+            console.log(allPosts)
+
 
             // adding Reactions Number
             for (var i=0;i<allPosts.length;i++){
@@ -90,6 +93,12 @@ class CommunityFunctions{
                 .addSelect("COUNT(*)",'count')
                 .getRawMany()
 
+                // Increase Post View in Normal Mode, Not in Admin or Dev Modes
+                if(reqData['effect']!=='0'){
+                    const singlePost = await Database.getRepository(Post).findOneBy({id:allPosts[i].id})
+                    singlePost.views+=1
+                    await Database.getRepository(Post).save(singlePost)
+                }
                 // Remove Identitity if hideIdentity
                 if (allPosts[i]['hideIdentity'] === 1){
                     allPosts[i]['userName'] = null
@@ -451,10 +460,11 @@ class CommunityFunctions{
                 "patient.profileImage as patientProfileImage",
             ])
             .orderBy('Comment.date', 'DESC')
-            .limit(15)
-            .offset(15* (Number(reqData['loadBlock'])-1))
+            .limit(2)
+            .offset(2* (Number(reqData['loadBlock'])-1))
             .getRawMany()
 
+            // Reactions Feature (Paused For )
             for (var i=0;i< commmentList.length;i++){
                 commmentList[i]['reactions'] = await Database.getRepository(PostCommentsReaction)
                 .createQueryBuilder('comment')
