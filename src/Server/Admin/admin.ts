@@ -83,4 +83,16 @@ router.post("/new-chat_plan", getCorsAccess, async (req, res) => {
     res.status(response['status']).json(response['data']);
 });
 
+// Remove a Post From Posts Lists (With a Message)
+router.delete("/post", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.Remove_post(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
+// Remove a Comment From Posts Lists (With a Message)
+router.delete("/post-comment", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.Remove_comment(req.body)
+    res.status(response['status']).json(response['data'])
+})
+
 export default router
