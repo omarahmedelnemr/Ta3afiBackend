@@ -89,6 +89,8 @@ class CommunityFunctions{
                 .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
                 .getCount()
 
+                allPosts[i]["likedByUser"] = await Database.getRepository(PostReaction).findOneBy({post:{id:allPosts[i].id},patient:{id:reqData['patientID']}})?true:false
+
                 // Increase Post View in Normal Mode, Not in Admin or Dev Modes
                 if(reqData['effect']!=='0'){
                     const singlePost = await Database.getRepository(Post).findOneBy({id:allPosts[i].id})
@@ -108,43 +110,43 @@ class CommunityFunctions{
         }
     }
     
-    // Search for an Post By Its Text (main Text)
-    async SearchForPostByText(reqData){
-        // Check Parameter Existence
-        const checkParams = checkUndefined(reqData,["searchText",'loadBlock'])
-        if (checkParams){
-            return responseGenerater.sendMissingParam(checkParams)
-        }
-        try{
-            if (reqData['loadBlock']<=0){
-                return responseGenerater.sendError("Invalid Load Block Value")
-            }
-            const allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
-            .andWhere("Post.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
-            .getRawMany();
+    // // Search for an Post By Its Text (main Text)
+    // async SearchForPostByText(reqData){
+    //     // Check Parameter Existence
+    //     const checkParams = checkUndefined(reqData,["searchText",'loadBlock'])
+    //     if (checkParams){
+    //         return responseGenerater.sendMissingParam(checkParams)
+    //     }
+    //     try{
+    //         if (reqData['loadBlock']<=0){
+    //             return responseGenerater.sendError("Invalid Load Block Value")
+    //         }
+    //         const allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
+    //         .andWhere("Post.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
+    //         .getRawMany();
 
-            // adding Reactions Number
-            for (var i=0;i<allPosts.length;i++){
-                allPosts[i]["images"] = await Database.getRepository(PostImages).findBy({post:{id:allPosts[i].id}})
-                allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id}})
-                allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
-                .createQueryBuilder('PostReaction')
-                .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
-                .getCount()
+    //         // adding Reactions Number
+    //         for (var i=0;i<allPosts.length;i++){
+    //             allPosts[i]["images"] = await Database.getRepository(PostImages).findBy({post:{id:allPosts[i].id}})
+    //             allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id}})
+    //             allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
+    //             .createQueryBuilder('PostReaction')
+    //             .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
+    //             .getCount()
 
-                // Remove Identitity if hideIdentity
-                if (allPosts[i]['hideIdentity'] === 1){
-                    allPosts[i]['userName'] = null
-                    allPosts[i]['userProfileImage'] = null
-                }
-            }
-            return responseGenerater.sendData(allPosts)
-        }catch(err){
-            console.log("Error!\n",err)
-            return responseGenerater.Error
-        }
+    //             // Remove Identitity if hideIdentity
+    //             if (allPosts[i]['hideIdentity'] === 1){
+    //                 allPosts[i]['userName'] = null
+    //                 allPosts[i]['userProfileImage'] = null
+    //             }
+    //         }
+    //         return responseGenerater.sendData(allPosts)
+    //     }catch(err){
+    //         console.log("Error!\n",err)
+    //         return responseGenerater.Error
+    //     }
 
-    }
+    // }
 
     // Get a User's Post That He Posts
     async GetPatientPosts(reqData){
