@@ -78,7 +78,6 @@ class CommunityFunctions{
                 .andWhere("Post.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
             }
             allPosts = await baseRepo.getRawMany()
-            console.log(allPosts)
 
 
             // adding Reactions Number
