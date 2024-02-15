@@ -58,7 +58,7 @@ class CommunityFunctions{
     async GetPostsFeed(reqData){
 
         // Check Parameter Existence
-        const checkParams = checkUndefined(reqData,['loadBlock'])
+        const checkParams = checkUndefined(reqData,['loadBlock',"patientID"])
         if (checkParams){
             return responseGenerater.sendMissingParam(checkParams)
         }
