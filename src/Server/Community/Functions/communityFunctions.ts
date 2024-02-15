@@ -200,8 +200,10 @@ class CommunityFunctions{
             newPost.date         = new Date(reqData['date'])
             newPost.hideIdentity = reqData['hideIdentity']
             newPost.patient      = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
-            newPost.community      = await Database.getRepository(Community).findOneBy({id:reqData['communityID']})
-
+            newPost.community    = await Database.getRepository(Community).findOneBy({id:reqData['communityID']})
+            
+            //Enabled For Developing
+            newPost.approved     = true  
 
             // Check if the Data is Wrong
             if (newPost.patient === null || newPost.community === null){
