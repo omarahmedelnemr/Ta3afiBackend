@@ -23,6 +23,12 @@ router.get("/post-feed", getCorsAccess, Authenticate, async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
+// Search For all Posts Using community (admin Version)
+router.get("/post-feed-admin", getCorsAccess, Authenticate, async (req,res)=>{
+    const response = await CommunityFunctions.GetAdminPostsFeed(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
 // // Search for posts By Using its Title
 // router.get("/post-by-text", getCorsAccess, Authenticate, async (req,res)=>{
 //     const response = await CommunityFunctions.SearchForPostByText(req.query)
