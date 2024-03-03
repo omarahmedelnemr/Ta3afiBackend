@@ -30,6 +30,8 @@ class CommunityFunctions{
             "Post.views as views",
             "Post.edited as edited",
             "Post.mainText as mainText",
+            "Post.AI_saftyRate as AI_saftyRate",
+            "Post.AI_saftyWord as AI_saftyWord",
             "Post.hideIdentity as hideIdentity",
             "community.name as community",
             "patient.id as patientID",
@@ -110,6 +112,11 @@ class CommunityFunctions{
         }
     }
     
+    // Get all Posts With a Category or Not
+    async GetAdminPostsFeed(reqData){
+        
+        return this.GetPostsFeed({...reqData,patientID:null})
+    }
     // // Search for an Post By Its Text (main Text)
     // async SearchForPostByText(reqData){
     //     // Check Parameter Existence

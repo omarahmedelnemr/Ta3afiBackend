@@ -30,6 +30,12 @@ export class Post{
     @Column({default:false})
     hideIdentity:boolean
 
+    @Column({nullable:true})
+    AI_saftyRate:number
+
+    @Column({nullable:true})
+    AI_saftyWord:string
+
     @Column({default:false,comment:"This Identify weather the Post is Been Deleted By Supervisors"})
     deleted:boolean
 
