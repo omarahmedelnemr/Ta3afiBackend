@@ -343,6 +343,14 @@ class CommunityFunctions{
             return responseGenerater.sendMissingParam(checkParams)
         }
         try{
+
+            // Check if The User Reacted Already
+            const reaction = await Database.getRepository(PostReaction).findOneBy({patient:{id:reqData['patientID']},post:{id:reqData['postID']}})
+            if (reaction){
+                return responseGenerater.sendError("You Already Reacted on this Post")
+
+            }
+
             const newReaction    = new PostReaction()
             newReaction.patient  = await Database.getRepository(Patient).findOneBy({id:reqData['patientID']})
             newReaction.post     = await Database.getRepository(Post).findOneBy({id:reqData['postID']})
@@ -353,6 +361,7 @@ class CommunityFunctions{
                 return responseGenerater.custom(403,"The Data you Entered is Wrong")
             }
 
+            
             // Save The Reaction to the DB
             await Database.getRepository(PostReaction).save(newReaction)
             
@@ -364,8 +373,10 @@ class CommunityFunctions{
             .getOne()
             const notifyText = newReaction.post.mainText.length > 20 ? newReaction.post.mainText.substring(0, 20) + '...' : newReaction.post.mainText;
             await NotificationFunctions.sendPatientNotification(writer.patient.id,'Interactions',"Someone Reacted on Your Post",notifyText)
-
-            return responseGenerater.done
+        
+            // Getting the Reactions Count after the User Adding Reaction
+            const newCount = await Database.getRepository(PostReaction).countBy({post:{id:reqData['postID']}})
+            return responseGenerater.sendData({"reactions":newCount,"likedByUser":true})
         }catch(err){
             console.log("Error!\n",err)
             return responseGenerater.Error
@@ -393,12 +404,13 @@ class CommunityFunctions{
             .createQueryBuilder('PostReaction')
             .delete()
             .from(PostReaction)
-
             .where("post.id = :postID", { postID: reqData['postID'] })
             .andWhere("patient.id = :patientID", { patientID: reqData['patientID'] })
             .execute()
-            
-            return responseGenerater.done
+
+            // Getting the Reactions Count after the User Removing Reaction
+            const newCount = await Database.getRepository(PostReaction).countBy({post:{id:reqData['postID']}})
+            return responseGenerater.sendData({"reactions":newCount,"likedByUser":false})
         }catch(err){
             console.log("Error!\n",err)
             return responseGenerater.Error
