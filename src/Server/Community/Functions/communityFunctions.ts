@@ -85,7 +85,7 @@ class CommunityFunctions{
             // adding Reactions Number
             for (var i=0;i<allPosts.length;i++){
                 allPosts[i]["images"] = await Database.getRepository(PostImages).findBy({post:{id:allPosts[i].id}})
-                allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id}})
+                allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id},deleted:false})
                 allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
                 .createQueryBuilder('PostReaction')
                 .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
@@ -117,43 +117,7 @@ class CommunityFunctions{
         
         return this.GetPostsFeed({...reqData,patientID:null})
     }
-    // // Search for an Post By Its Text (main Text)
-    // async SearchForPostByText(reqData){
-    //     // Check Parameter Existence
-    //     const checkParams = checkUndefined(reqData,["searchText",'loadBlock'])
-    //     if (checkParams){
-    //         return responseGenerater.sendMissingParam(checkParams)
-    //     }
-    //     try{
-    //         if (reqData['loadBlock']<=0){
-    //             return responseGenerater.sendError("Invalid Load Block Value")
-    //         }
-    //         const allPosts = await (await this.getCommonQueryBuilder(reqData['loadBlock']))
-    //         .andWhere("Post.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
-    //         .getRawMany();
 
-    //         // adding Reactions Number
-    //         for (var i=0;i<allPosts.length;i++){
-    //             allPosts[i]["images"] = await Database.getRepository(PostImages).findBy({post:{id:allPosts[i].id}})
-    //             allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id}})
-    //             allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
-    //             .createQueryBuilder('PostReaction')
-    //             .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
-    //             .getCount()
-
-    //             // Remove Identitity if hideIdentity
-    //             if (allPosts[i]['hideIdentity'] === 1){
-    //                 allPosts[i]['userName'] = null
-    //                 allPosts[i]['userProfileImage'] = null
-    //             }
-    //         }
-    //         return responseGenerater.sendData(allPosts)
-    //     }catch(err){
-    //         console.log("Error!\n",err)
-    //         return responseGenerater.Error
-    //     }
-
-    // }
 
     // Get a User's Post That He Posts
     async GetPatientPosts(reqData){
@@ -172,7 +136,7 @@ class CommunityFunctions{
             // adding Reactions Number
             for (var i=0;i<allPosts.length;i++){
                 allPosts[i]["images"] = await Database.getRepository(PostImages).findBy({post:{id:allPosts[i].id}})
-                allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id}})
+                allPosts[i]["commentsNumber"] = await Database.getRepository(PostComment).countBy({post:{id:allPosts[i].id},deleted:false})
                 allPosts[i]["reactions"] = await Database.getRepository(PostReaction)
                 .createQueryBuilder('PostReaction')
                 .where("PostReaction.post.id = :postID",{postID:allPosts[i].id})
@@ -452,7 +416,8 @@ class CommunityFunctions{
             const commmentList = await Database.getRepository(PostComment)
             .createQueryBuilder("Comment")
             .innerJoinAndSelect("Comment.patient","patient")
-            .where("Comment.post = :postID",{postID:reqData['postID']})
+            .where("Comment.deleted = false")
+            .andWhere("Comment.post = :postID",{postID:reqData['postID']})
             .select([
                 "Comment.id as id",
                 "Comment.comment as comment",

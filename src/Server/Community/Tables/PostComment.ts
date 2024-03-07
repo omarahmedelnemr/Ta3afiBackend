@@ -15,6 +15,9 @@ export class PostComment{
     @Column()
     date:Date
 
+    @Column({default:false})
+    deleted:boolean
+
     @ManyToOne(()=>Post,PostID=>PostID.id)
     @JoinColumn()
     post:Post
