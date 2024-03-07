@@ -23,7 +23,7 @@ router.post("/category-decision", getCorsAccess, Authenticate, async (req,res)=>
 
 // Get All Un-Approved Posts
 router.get("/unapproved-posts", getCorsAccess, Authenticate, async (req,res)=>{
-    const response = await SupervisorFunction.getAllunapprovedPosts()
+    const response = await SupervisorFunction.getAllunapprovedPosts(req.query)
     res.status(response['status']).json(response['data'])
 })
 
