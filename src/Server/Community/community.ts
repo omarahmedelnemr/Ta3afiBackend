@@ -29,12 +29,6 @@ router.get("/post-feed-admin", getCorsAccess, Authenticate, async (req,res)=>{
     res.status(response['status']).json(response['data'])
 })
 
-// // Search for posts By Using its Title
-// router.get("/post-by-text", getCorsAccess, Authenticate, async (req,res)=>{
-//     const response = await CommunityFunctions.SearchForPostByText(req.query)
-//     res.status(response['status']).json(response['data'])
-// })
-
 // Get All posts That A Spisific Patient Posts
 router.get("/patient-posts", getCorsAccess, Authenticate, async (req,res)=>{
     const response = await CommunityFunctions.GetPatientPosts(req.query)
