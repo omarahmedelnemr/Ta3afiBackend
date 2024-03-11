@@ -18,8 +18,14 @@ router.get("/category-list", getCorsAccess, async (req,res)=>{
 })
 
 // Search For all Posts Using category
-router.get("/article-list", getCorsAccess, async (req,res)=>{
+router.get("/article-feed", getCorsAccess, async (req,res)=>{
     const response = await blogsFunctions.GetAllArticleList(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Search For all Posts Using category
+router.get("/article-feed-admin", getCorsAccess, async (req,res)=>{
+    const response = await blogsFunctions.GetAdminAllArticleList(req.query)
     res.status(response['status']).json(response['data'])
 })
 

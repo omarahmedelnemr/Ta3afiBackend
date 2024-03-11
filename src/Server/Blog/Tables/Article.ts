@@ -15,7 +15,7 @@ export class Article{
     @Column({nullable:true,comment:"The image that is Displayed on the List Page or int the Post Page"})
     covorImage:string
 
-    @Column()
+    @Column({ type: 'text' })
     mainText:string
 
     @Column()
@@ -26,6 +26,12 @@ export class Article{
 
     @Column({default:false})
     edited:boolean
+
+    @Column({nullable:true})
+    AI_saftyRate:number
+
+    @Column({nullable:true})
+    AI_saftyWord:string
 
     @ManyToOne(()=>Categories,categoryD=>categoryD.id)
     @JoinColumn()

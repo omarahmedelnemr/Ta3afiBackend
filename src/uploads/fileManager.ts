@@ -22,7 +22,7 @@ router.post("/upload",async (req,res)=>{
 
     }
     const file = req.files.file ===undefined ? req.files['files[]']:req.files.file;
-
+    
     try{
         if (!file) {
             return res.status(400).send('No files were uploaded');
@@ -54,17 +54,22 @@ router.post("/upload",async (req,res)=>{
 
 // Show Files Route
 router.get("/file/:fileName",async (req,res)=>{
-    const fileName = req.params.fileName;
-    const fileType = fileName.split('.')[1]
-    if (fileType.toLowerCase() == 'pdf'){
-        const filePath = path.join(__dirname, './pdf', fileName);
-        res.sendFile(filePath);
+    try{
+        const fileName = req.params.fileName;
+        const fileType = fileName.split('.')[1]
+        if (fileType.toLowerCase() == 'pdf'){
+            const filePath = path.join(__dirname, './pdf', fileName);
+            res.sendFile(filePath);
 
-    }else if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
-        const filePath = path.join(__dirname, './images', fileName);
-        res.sendFile(filePath);
-    }else{
-        res.status(404).send('File Type Is Not Supported')
+        }else if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
+            const filePath = path.join(__dirname, './images', fileName);
+            res.sendFile(filePath);
+        }else{
+            res.status(404).send('File Type Is Not Supported')
+        }
+    }catch(err){
+        console.log("Error!!\n",err)
+        res.status(502).send("Error While DB Connection")
     }
 });
 
@@ -74,7 +79,7 @@ router.post('/uploadProfilePic',Authenticate,getCorsAccess,async (req:any, res:a
     if (!req.files) {
         return res.status(400).send('No files were uploaded.');
     }
-    const file = req.files.file;
+    const file = req.files.file as Router.Multer.File;
 
     const fileType = file.name.split('.')[file.name.split('.').length-1]
     var filePath = ''
@@ -99,10 +104,16 @@ router.post('/uploadProfilePic',Authenticate,getCorsAccess,async (req:any, res:a
 router.get('/profilePic/:fileName', (req:any, res:any) => {
     const fileName = req.params.fileName;
     const fileType = fileName.split('.')[1]
-    if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
-        const filePath = path.join(__dirname, './profilePics', fileName);
-        res.sendFile(filePath);
-    }else{
+    try{
+
+        if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
+            const filePath = path.join(__dirname, './profilePics', fileName);
+            res.sendFile(filePath);
+        }else{
+            res.status(404).send('File Type Is Not Supported')
+        }
+    }catch(err){
+        console.log("Error!\n",err)
         res.status(404).send('File Type Is Not Supported')
     }
 });

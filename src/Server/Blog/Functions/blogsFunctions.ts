@@ -19,6 +19,36 @@ import NotificationFunctions from "../../User Info/Functions/NotificationFunctio
 class BlogFunctions{
 
     //-------------------------------------------------------------------------------------------
+    //--------------------------------- General Post Viewing ------------------------------------
+    //-------------------------------------------------------------------------------------------
+    async getCommonQueryBuilder  (loadBlock){
+        return await Database.getRepository(Article)
+        .createQueryBuilder("article")
+        .innerJoinAndSelect("article.doctor","doctor")
+        .innerJoinAndSelect("article.category","category")
+        .select([
+            "article.id as id",
+            "article.title as title",
+            "article.covorImage as covorImage",
+            "article.date as date",
+            "article.edited as edited",
+            "SUBSTRING(article.mainText, 1, 100) as mainText",
+            "article.AI_saftyRate as AI_saftyRate",
+            "article.AI_saftyWord as AI_saftyWord",
+            "article.views as views",
+            "category.category as category",
+            "doctor.name as doctorName",
+            "doctor.title as doctorTitle",
+            "doctor.profileImage as doctorProfileImage",
+            "doctor.starRate as doctorStarRate",
+            "doctor.completedSessions as doctorSessionNumber"
+        ])
+        .orderBy('article.date', 'DESC')
+        .limit(15)
+        .offset(15* (Number(loadBlock)-1))
+    };
+
+    //-------------------------------------------------------------------------------------------
     //-------------------------------------- General --------------------------------------------
     //-------------------------------------------------------------------------------------------
     
@@ -44,62 +74,68 @@ class BlogFunctions{
         }
         try{
             var allArticles;
+            var baseQuery = await this.getCommonQueryBuilder(reqData['loadBlock']);
 
-            // Getting all Articles Without Category Classification
-            if (reqData["categoryID"] === undefined ){
-                allArticles = await Database.getRepository(Article)
-                .createQueryBuilder("article")
-                .innerJoinAndSelect("article.doctor","doctor")
-                .innerJoinAndSelect("article.category","category")
-                .select([
-                    "article.id as id",
-                    "article.title as title",
-                    "article.covorImage as covorImage",
-                    "article.date as date",
-                    "article.views as views",
-                    "category.category as category",
-                    "doctor.name as doctorName",
-                    "doctor.title as doctorTitle",
-                    "doctor.profileImage as doctorProfileImage",
-                    "doctor.starRate as doctorStarRate",
-                    "doctor.sessionsNumber as doctorSessionNumber"
-                ])
-                .orderBy('article.date', 'DESC')
-                .limit(15)
-                .offset(15* (Number(reqData['loadBlock'])-1))
-                .getRawMany()
+            if (reqData["categoryID"] !== undefined ){
+                baseQuery = baseQuery
+                .andWhere("category.id = :categoryID", { categoryID: reqData['categoryID'] })
+                
+            }
+            // Getting Article With a specific Text in them
+            if (reqData["searchText"] !== undefined ){
+                baseQuery = baseQuery
+                .andWhere("article.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
             }
 
-            // Getting a specific Category Articles
-            else{
-                allArticles = await Database.getRepository(Article)
-                .createQueryBuilder("article")
-                .innerJoinAndSelect("article.doctor","doctor")
-                .innerJoinAndSelect("article.category","category")
-                .where("category.id = :categoryID" ,{categoryID:reqData['categoryID']})
-                .select([
-                    "article.id as id",
-                    "article.title as title",
-                    "article.covorImage as covorImage",
-                    "article.date as date",
-                    "article.views as views",
-                    "category.category as category",
-                    "doctor.name as doctorName",
-                    "doctor.title as doctorTitle",
-                    "doctor.profileImage as doctorProfileImage",
-                    "doctor.starRate as doctorStarRate",
-                    "doctor.sessionsNumber as doctorSessionNumber"
-                ])
-                .orderBy('article.date', 'DESC')
-                .limit(15)
-                .offset(15* (Number(reqData['loadBlock'])-1))
-                .getRawMany()
-            }
+            allArticles = await baseQuery.getRawMany()
+
 
             // adding Seen and upvotesNumbers
             for (var i=0;i<allArticles.length;i++){
                 allArticles[i]["seenCount"] = await Database.getRepository(ArticleSeen).countBy({article:{id:allArticles[i].id}})
+                allArticles[i]["commentsNumber"] = await Database.getRepository(ArticleComment).countBy({article:{id:allArticles[i].id}})
                 allArticles[i]["upVotes"] = await Database.getRepository(ArticleVotes).countBy({article:{id:allArticles[i].id}})
+                
+            }
+            return responseGenerater.sendData(allArticles)
+        }catch(err){
+            console.log("Error!\n",err)
+            return responseGenerater.Error
+        }
+    }
+
+    // Get all Articles With a Category or Not
+    async GetAdminAllArticleList(reqData){
+        // Check Parameter Existence
+        const checkParam  = checkUndefined(reqData,['loadBlock'])
+        if (checkParam){
+            return responseGenerater.sendMissingParam(checkParam)
+        }
+        try{
+            var allArticles;
+            var baseQuery = await this.getCommonQueryBuilder(reqData['loadBlock']);
+
+            if (reqData["categoryID"] !== undefined ){
+                baseQuery = baseQuery
+                .andWhere("category.id = :categoryID", { categoryID: reqData['categoryID'] })
+                
+            }
+            // Getting Article With a specific Text in them
+            if (reqData["searchText"] !== undefined ){
+                baseQuery = baseQuery
+                .andWhere("article.mainText like :searchText", { searchText: "%" + reqData['searchText'] + "%" })
+            }
+
+            allArticles = await baseQuery.getRawMany()
+
+
+            // adding Seen and upvotesNumbers
+            for (var i=0;i<allArticles.length;i++){
+                allArticles[i]["seenCount"] = await Database.getRepository(ArticleSeen).countBy({article:{id:allArticles[i].id}})
+                allArticles[i]["commentsNumber"] = await Database.getRepository(ArticleComment).countBy({article:{id:allArticles[i].id}})
+                allArticles[i]["upVotes"] = await Database.getRepository(ArticleVotes).countBy({article:{id:allArticles[i].id}})
+                allArticles[i]["images"] = await Database.getRepository(ArticleImages).findBy({article:{id:allArticles[i].id}})
+                
             }
             return responseGenerater.sendData(allArticles)
         }catch(err){
@@ -132,7 +168,7 @@ class BlogFunctions{
                 "doctor.title as doctorTitle",
                 "doctor.profileImage as doctorProfileImage",
                 "doctor.starRate as doctorStarRate",
-                "doctor.sessionsNumber as doctorSessionNumber"
+                "doctor.completedSessions as doctorSessionNumber"
             ])
             .orderBy('article.date', 'DESC')
             .limit(15)
@@ -160,6 +196,7 @@ class BlogFunctions{
             const articleInfo = await Database.getRepository(Article)
             .createQueryBuilder("article")
             .innerJoinAndSelect("article.doctor",'doctor')
+            .innerJoinAndSelect("article.category",'category')
             .where("article.id = :articleID",{articleID:reqData['articleID']})
             .select([
                 "article.id as id",
@@ -169,17 +206,18 @@ class BlogFunctions{
                 "article.edited as edited",
                 "article.date as date",
                 "article.views as views",
+                "category.category as category",
                 "doctor.name as doctorName",
                 "doctor.title as doctorTitle",
                 "doctor.profileImage as doctorProfileImage",
                 "doctor.starRate as doctorStarRate",
-                "doctor.sessionsNumber as doctorSessionNumber"
+                "doctor.completedSessions as doctorSessionNumber"
             ])
             .getRawOne()
 
-            // Adding View Count
-            articleInfo.views +=1
-            await Database.getRepository(Article).save(articleInfo)
+            // // Adding View Count
+            // articleInfo.views +=1
+            // await Database.getRepository(Article).save(articleInfo)
 
             // Check if The Article Not Found
             if(articleInfo === null){
@@ -193,6 +231,7 @@ class BlogFunctions{
             articleInfo['upVotes'] = await Database.getRepository(ArticleVotes).countBy({article:{id:articleInfo.id}}) 
             articleInfo['DoctorUpVotes'] = await Database.getRepository(ArticleDoctorVotes).countBy({article:{id:articleInfo.id}}) 
             articleInfo['seen'] = await Database.getRepository(ArticleSeen).countBy({article:{id:articleInfo.id}}) 
+            articleInfo['commentsNumber'] = await Database.getRepository(ArticleComment).countBy({article:{id:articleInfo.id}}) 
 
             // Mark it as Seen
             if (reqData["patientID"] !== undefined){
@@ -222,11 +261,12 @@ class BlogFunctions{
                 "Comment.id as id",
                 "Comment.comment as comment",
                 "Comment.date as date",
+                "doctor.id as doctorID",
                 "doctor.name as doctorName",
                 "doctor.title as doctorTitle",
                 "doctor.profileImage as doctorProfileImage",
                 "doctor.starRate as doctorStarRate",
-                "doctor.sessionsNumber as doctorSessionNumber"
+                "doctor.completedSessions as doctorSessionNumber"
             ])
             .orderBy('Comment.date', 'DESC')
             .limit(15)
@@ -246,7 +286,7 @@ class BlogFunctions{
                     "doctor.profileImage as profileImage",
                     "doctor.gender as gender",
                     "doctor.starRate as starRate",
-                    "doctor.sessionsNumber as sessionsNumber"
+                    "doctor.completedSessions as sessionsNumber"
                 ])
                 .getRawMany()
             }
@@ -319,7 +359,7 @@ class BlogFunctions{
                 "doctor.title as doctorTitle",
                 "doctor.profileImage as doctorProfileImage",
                 "doctor.starRate as doctorStarRate",
-                "doctor.sessionsNumber as doctorSessionNumber"
+                "doctor.completedSessions as doctorSessionNumber"
             ])
             .orderBy('article.date', 'DESC')
             .limit(15)
@@ -934,7 +974,7 @@ class BlogFunctions{
                 "doctor.title as doctorTitle",
                 "doctor.profileImage as doctorProfileImage",
                 "doctor.starRate as doctorStarRate",
-                "doctor.sessionsNumber as doctorSessionNumber"
+                "doctor.completedSessions as doctorSessionNumber"
             ])
             .orderBy('article.date', 'DESC')
             .limit(15)
