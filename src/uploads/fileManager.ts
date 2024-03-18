@@ -79,25 +79,32 @@ router.post('/uploadProfilePic',Authenticate,getCorsAccess,async (req:any, res:a
     if (!req.files) {
         return res.status(400).send('No files were uploaded.');
     }
-    const file = req.files.file as Router.Multer.File;
+    try{
 
-    const fileType = file.name.split('.')[file.name.split('.').length-1]
-    var filePath = ''
-    if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
-        filePath = './profilePics'
-    }else{
-        return res.status("400").json('File Type is Not Supported')
-        
-    }
-    const  d = new Date()
-    const fileName = String(d.getTime())+"."+fileType
-    file.mv(path.join(__dirname, filePath,fileName),async (err:any) => {
-        if (err) {
-            return res.status(500).send(err);
+    
+        const file = req.files.file as Router.Multer.File;
+
+        const fileType = file.name.split('.')[file.name.split('.').length-1]
+        var filePath = ''
+        if (['png','jpg','jpeg'].includes(fileType.toLowerCase())){
+            filePath = './profilePics'
+        }else{
+            return res.status("400").json('File Type is Not Supported')
+            
         }
+        const  d = new Date()
+        const fileName = String(d.getTime())+"."+fileType
+        file.mv(path.join(__dirname, filePath,fileName),async (err:any) => {
+            if (err) {
+                return res.status(500).send(err);
+            }
 
-        return res.status(200).json(fileName);
-    });
+            return res.status(200).json(fileName);
+        });
+    }catch(err){
+        console.log("Error!!\n",err)
+        res.status(502).send("Error While DB Connection")
+    }
 });
 
 // Show  profile Pics route
