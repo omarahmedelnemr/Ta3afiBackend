@@ -17,13 +17,15 @@ const router = Router()
 // Upload File Route
 router.post("/upload",async (req,res)=>{
     console.log('uploading a File!')
+    console.log("Body: ", req.body)
+    console.log("Files: ", req.files)
     if (req.files === null || req.files === undefined){
         return res.status(400).send('No files were uploaded');
 
     }
     try{
         const file = req.files.file ===undefined ? req.files['files[]']:req.files.file;
-
+        console.log("Files: ",file)
         if (!file) {
             return res.status(400).send('No files were uploaded');
         }
