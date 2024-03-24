@@ -24,14 +24,52 @@ router.post("/checkAuth", AdminAuthenticate, async (req, res) => {
     res.status(200).json('authorized')
 });
 
-router.get("/dashboard", (req, res) => {
-    res.sendFile(path.join(__dirname, "../public/dashboard.html"));
-  });
 
+// Get a Patients Number
+router.get("/patients-number", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getPatientsNumber(req.query)
+    res.status(response['status']).json(response['data'])
+})
 
-// Get a General Info
-router.get("/general", getCorsAccess, async (req,res)=>{
-    const response = await adminFunctions.getGeneralData(req.query)
+// Get a doctors Number
+router.get("/doctors-number", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getDoctorsNumber(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get a articles Number
+router.get("/articles-number", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getarticlesNumber(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get a Posts Number
+router.get("/posts-number", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getPostsNumber(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get a Posts Count Over a Given Period
+router.get("/posts-overtime", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getPostsOvertime(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get a Articles Count Over a Given Period
+router.get("/articles-overtime", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getArticlesOvertime(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get Appointments Count Over a Given Period
+router.get("/appointments-overtime", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getAppointmentsOvertime(req.query)
+    res.status(response['status']).json(response['data'])
+})
+
+// Get the Appointment Statuses Counts
+router.get("/appointment-status", getCorsAccess, async (req,res)=>{
+    const response = await adminFunctions.getAppointmentStatus(req.query)
     res.status(response['status']).json(response['data'])
 })
 
@@ -40,18 +78,6 @@ router.get("/supervisors", getCorsAccess, async (req,res)=>{
     const response = await adminFunctions.GetAllSupervisors(req.query)
     res.status(response['status']).json(response['data'])
 })
-
-// Get Posts activity over Months
-router.get("/posts-activity", getCorsAccess, async (req, res) => {
-    const response = await adminFunctions.getPostsActivityOverTime(req.query);
-    res.status(response['status']).json(response['data']);
-});
-
-// Get Article activity over Months
-router.get("/article-activity", getCorsAccess, async (req, res) => {
-    const response = await adminFunctions.getArticleActivityOverTime(req.query);
-    res.status(response['status']).json(response['data']);
-});
 
 // Create a Signup Link For Supervisors
 router.post("/supervisor-signup-link", getCorsAccess, async (req, res) => {
