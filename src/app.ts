@@ -8,6 +8,7 @@ import NotificationRouter from './Server/User Info/Notifications'
 import AdminRouter from './Server/Admin/admin'
 import ChatRouter from './Server/Chat/Chat'
 import AppointmentRouter from './Server/Appointments/Appointments'
+import AI_Prompts from './Server/AIChat/AI'
 import fileManager from './uploads/fileManager'
 const { InitializeChat } = require('./Server/Chat/ChatIO'); // Adjust the path as needed
 const { InitializeNotify }   = require("./Server/User Info/NotificationsIO")
@@ -72,6 +73,9 @@ app.use("/admin",AdminRouter)
 
 // Chat Features
 app.use("/chat",ChatRouter)
+
+// AI Chat Features
+app.use("/ai",AI_Prompts)
 
 // Appointment Features
 app.use("/appointment",AppointmentRouter)
