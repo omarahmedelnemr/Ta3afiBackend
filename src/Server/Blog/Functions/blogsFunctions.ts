@@ -14,6 +14,8 @@ import { Patient } from "../../User Info/Tables/Users/Patient";
 import checkUndefined from "../../../Public Functions/checkUndefined";
 import responseGenerater from "../../../Public Functions/responseGenerator";
 import NotificationFunctions from "../../User Info/Functions/NotificationFunctions";
+import { DefualtAIChat } from "../../../Middleware/GenAI";
+import parse_AI_Text from "../../../Middleware/ParseAIText";
 
 
 class BlogFunctions{
@@ -388,6 +390,29 @@ class BlogFunctions{
             return responseGenerater.sendMissingParam(checkParams)
         }
         try{
+            // AI Checking Section
+            var AI_saftyRate,AI_saftyWord ;
+            try{
+                const AI_Propmt = `Rate the Next Message in the Context of a Post in Medical Community,
+                Rate the Message and Give a Rate in percentage Weather the Message is Safe or it has a Problem, 
+                and Decide what is the Probable Problem, 
+                it might be one of (spam, scam, Nudity, Sucideal or Self-injury, Violance, Hate Speech, Illigal)
+                if it is Somthing else, give a Word for the Problem, 
+                your Response Should be in the Form :'Safety_Rate:{How Much the Post is Safe as Integer from 1 to 100},Status:{Safe if the Post is More than 70 safe, otherwise put a Word of the Problem}',
+                The Post:'title: ${reqData['title']}, text: ${reqData['mainText']}'`
+                const AI_Response = await DefualtAIChat.sendMessage(AI_Propmt)
+                const AI_Dict_Response = parse_AI_Text(AI_Response.response.text())
+                AI_saftyRate = Number(AI_Dict_Response['Safety_Rate'])
+                AI_saftyWord = AI_Dict_Response['Status']
+                if(isNaN(AI_saftyRate)){
+                    throw new Error("The Safety Rate is corrupted");
+                }
+            }catch(err){
+                console.log("Error When Try To Reach The genAI API!!\n",err)
+                AI_saftyRate = undefined
+                AI_saftyWord = "AI Not Available"
+            }
+
             // Create New Article
             const newArticle      = new Article()
             newArticle.date       = new Date(reqData['date'])
@@ -396,6 +421,8 @@ class BlogFunctions{
             newArticle.mainText   = reqData["mainText"]
             newArticle.doctor     = await Database.getRepository(Doctor).findOneBy({id:reqData['doctorID']})
             newArticle.category   = await Database.getRepository(Categories).findOneBy({id:reqData['categoryID']})
+            newArticle.AI_saftyRate = AI_saftyRate
+            newArticle.AI_saftyWord = AI_saftyWord
 
             // check if The Data was Missing
             if(newArticle.doctor === null || newArticle.category === null){
