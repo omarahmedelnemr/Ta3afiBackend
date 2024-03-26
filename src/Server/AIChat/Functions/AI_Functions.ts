@@ -22,7 +22,7 @@ class AI_Functions{
         }
         try{
             const prompt = `If the Next Propt it Related to The Medical Field, Mental Health, Some Personal Talking with no Personl Info, or Somthing that Might Be Said in the Context of Medical Group  and Safe, Response to It, other With,
-            Respond With 'i am a Model Working With Medical Questions and This Question is Not Related' But Don't Be Relly Strict, The Prompt:(${reqData['prompt']})`
+            Respond With 'i am a Model Working With Medical Questions and This Question is Not Related' or Something Like That, But Don't Be Relly Strict, and Be Friendly, The Prompt:(${reqData['prompt']})`
             const AI_Response = await AIChat.sendMessage(prompt)
 
             return responseGenerator.sendData(AI_Response.response.text())
